@@ -19,6 +19,7 @@ class _ImageCroppingState extends State<ImageCropping> {
 
   final _cropController = CropController();
   Uint8List? _croppedData;
+  final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
 
   @override
   Widget build(BuildContext context) {
@@ -40,37 +41,38 @@ class _ImageCroppingState extends State<ImageCropping> {
                   child: Stack(
                     children: [
                       Crop(
-                          controller: _cropController,
-                          image: imageData,
-                          onCropped: (croppedData) => setState(() {
-                                _croppedData = croppedData;
-                              }),
-                          initialAreaBuilder: (rect) => Rect.fromLTRB(
-                              rect.left + 54,
-                              rect.top + 62,
-                              rect.right - 54,
-                              rect.bottom - 62),
-                          cornerDotBuilder: (size, edgeAlignment) =>
-                              const DotControl(
-                                  color: Color.fromARGB(255, 0, 204, 17)),
-                          interactive: true)
+                        controller: _cropController,
+                        image: imageData,
+                        onCropped: (croppedData) => setState(() {
+                          _croppedData = croppedData;
+                        }),
+                        initialAreaBuilder: (rect) => Rect.fromLTRB(
+                            rect.left + 54,
+                            rect.top + 62,
+                            rect.right - 54,
+                            rect.bottom - 62),
+                        cornerDotBuilder: (size, edgeAlignment) =>
+                            const DotControl(
+                                color: Color.fromARGB(255, 0, 204, 17)),
+                        interactive: true,
+                        baseColor: backgroundColour,
+                      )
                     ],
                   ),
                 ),
               ),
               if (_croppedData == null)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () => _crop(context),
-                          child: const Text('CROP IT!'),
-                        ),
+                Container(
+                  color: Colors.amberAccent,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 0, 32, 1),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => _crop(context),
+                        child: const Text('Transform it!'),
                       ),
-                    ],
+                    ),
                   ),
                 ),
             ],
