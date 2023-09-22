@@ -2,8 +2,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
-import 'package:phone_client/image_proccessing.dart';
+import 'package:phone_client/image_proccessing/image_proccessing.dart';
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
@@ -22,11 +21,8 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.veryHigh,
-    );
-
+    _controller = CameraController(widget.camera, ResolutionPreset.high,
+        enableAudio: false, imageFormatGroup: ImageFormatGroup.jpeg);
     _initializeControllerFuture = _controller.initialize();
   }
 
@@ -38,6 +34,8 @@ class _CameraScreenState extends State<CameraScreen> {
 
   Future<void> _captureAndSaveImage() async {
     if (!_controller.value.isTakingPicture) {
+      await _controller.setFlashMode(FlashMode.off);
+      await _controller.setFocusMode(FocusMode.auto);
       try {
         final xFile = await _controller.takePicture();
         final path = xFile.path;
@@ -71,30 +69,31 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Camera Preview'),
-      ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Column(
-              children: [
-                Expanded(
-                  child: CameraPreview(_controller),
-                ),
-                ElevatedButton(
-                  onPressed: _captureAndSaveImage,
-                  child: const Text('Capture and Save'),
-                ),
-              ],
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-    );
+    return SafeArea(
+        child: Scaffold(
+            body: FutureBuilder<void>(
+              future: _initializeControllerFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: CameraPreview(_controller),
+                      ),
+                    ],
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: FloatingActionButton.extended(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.black87,
+                onPressed: _captureAndSaveImage,
+                label: const Text('Take a photo'),
+                icon: const Icon(Icons.photo_camera_front_rounded))));
   }
 }
