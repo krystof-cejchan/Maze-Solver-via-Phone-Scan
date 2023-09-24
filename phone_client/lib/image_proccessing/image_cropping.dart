@@ -13,80 +13,50 @@ class ImageCropping extends StatefulWidget {
   State<ImageCropping> createState() => _ImageCroppingState(imageData);
 }
 
-class _ImageCroppingState extends State<ImageCropping> {
+class _ImageCroppingState extends State<ImageCropping>
+    with WidgetsBindingObserver {
   _ImageCroppingState(this.imageData);
-  final Uint8List imageData;
 
-  final _cropController = CropController();
-  Uint8List? _croppedData;
+  final Uint8List imageData;
+  late final CropController _cropController = CropController();
+
+  late Uint8List _croppedData = imageData;
+
   final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Center(
-          child: Column(
-            children: [
-              Expanded(
-                child: Visibility(
-                  visible: _croppedData == null,
-                  replacement: Center(
-                    child: _croppedData == null
-                        ? const SizedBox.shrink()
-                        : Image.memory(_croppedData!),
-                  ),
-                  child: Stack(
-                    children: [
-                      Crop(
-                        controller: _cropController,
-                        image: imageData,
-                        onCropped: (croppedData) => setState(() {
-                          _croppedData = croppedData;
-                        }),
-                        initialAreaBuilder: (rect) => Rect.fromLTRB(
-                            rect.left + 54,
-                            rect.top + 62,
-                            rect.right - 54,
-                            rect.bottom - 62),
-                        cornerDotBuilder: (size, edgeAlignment) =>
-                            const DotControl(
-                                color: Color.fromARGB(255, 0, 204, 17)),
-                        interactive: true,
-                        baseColor: backgroundColour,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              if (_croppedData == null)
-                Container(
-                  color: Colors.amberAccent,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(32, 0, 32, 1),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => _crop(context),
-                        child: const Text('Transform it!'),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+        body: GestureDetector(
+          child: Crop(
+            controller: _cropController,
+            image: imageData,
+            onCropped: (croppedData) => setState(() {
+              _croppedData = croppedData;
+            }),
+            initialAreaBuilder: (rect) => Rect.fromLTRB(rect.left + 54,
+                rect.top + 62, rect.right - 54, rect.bottom - 62),
+            cornerDotBuilder: (size, edgeAlignment) =>
+                const DotControl(color: Color.fromARGB(255, 0, 204, 17)),
+            interactive: true,
+            baseColor: backgroundColour,
+            fixArea: false,
           ),
         ),
-      ),
-    );
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.miniEndDocked,
+        floatingActionButton: FloatingActionButton.small(
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.black87,
+            onPressed: () => _crop(context),
+            child: const Icon(Icons.done_all_rounded)));
   }
 
   void _crop(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageTransformation(imageData: _croppedData!)),
+          builder: (context) => ImageTransformation(imageData: _croppedData)),
     );
   }
 }
