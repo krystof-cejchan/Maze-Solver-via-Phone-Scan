@@ -1,8 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:path/path.dart';
 import 'package:phone_client/image_transformation/image2graph.dart';
 
 class ImageCropping extends StatefulWidget {
@@ -18,7 +16,7 @@ class _ImageCroppingState extends State<ImageCropping>
   _ImageCroppingState(this.imageData);
 
   final Uint8List imageData;
-  late final CropController _cropController = CropController();
+  final CropController _cropController = CropController();
 
   late Uint8List _croppedData = imageData;
 
@@ -46,8 +44,8 @@ class _ImageCroppingState extends State<ImageCropping>
         floatingActionButtonLocation:
             FloatingActionButtonLocation.miniEndDocked,
         floatingActionButton: FloatingActionButton.small(
-            backgroundColor: Colors.blueAccent,
-            foregroundColor: Colors.black87,
+            backgroundColor: Colors.black87,
+            foregroundColor: const Color.fromARGB(255, 75, 189, 0),
             onPressed: () => _crop(context),
             child: const Icon(Icons.done_all_rounded)));
   }
@@ -59,13 +57,4 @@ class _ImageCroppingState extends State<ImageCropping>
           builder: (context) => ImageTransformation(imageData: _croppedData)),
     );
   }
-}
-
-Future<dynamic> _saveScreenShot(Uint8List bytes) async {
-  var buffer = bytes.buffer.asUint8List();
-  final result = await ImageGallerySaver.saveImage(buffer,
-      quality: 100,
-      name: join('maze_pic_', DateTime.now().toString()).toString());
-
-  return result;
 }

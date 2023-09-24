@@ -43,7 +43,7 @@ dependencies:
   image_gallery_saver: ^2.0.3
   permission_handler: ^11.0.0
   url_launcher: ^6.1.14
-  crop_your_image: ^0.7.5
+  crop_your_image: ^0.7.4
 
 dev_dependencies:
   flutter_test:
