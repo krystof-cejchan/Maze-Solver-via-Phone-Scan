@@ -1,0 +1,1 @@
+class PictureSizeDoesNotMatchArrayLength implements Exception {}
