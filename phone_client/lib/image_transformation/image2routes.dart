@@ -1,32 +1,49 @@
-import 'dart:io';
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/exceptions/picture_size.dart';
+import 'package:phone_client/helpers/lib_class.dart';
+import '../helpers/custom_image_class.dart' as custom;
 
 /// This class serves to convert an image to an 2D array representing a maze;
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
-class ImageConversion extends StatelessWidget {
-  ImageConversion({Key? key, required this.imageData}) : super(key: key);
+class ImageConversion extends StatefulWidget {
+  const ImageConversion._(this.customImage, this.edImage, this.routeColour);
 
-  final double threshold = 20;
+  factory ImageConversion(custom.Image customImage, {Color? colourOfRoute}) {
+    return ImageConversion._(customImage, customImage.image,
+        colourOfRoute ?? const Color.fromARGB(206, 0, 0, 0));
+  }
 
-  final Uint8List imageData;
-  final Color routeColour = const Color.fromARGB(206, 0, 0, 0);
-  late final Image image = Image.memory(imageData);
+  final custom.Image customImage;
+  final img.Image edImage;
+  final Color routeColour;
 
-  late final img.Image edImage = img.Image.fromBytes(
-      width: image.width!.toInt(),
-      height: image.height!.toInt(),
-      bytes: imageData.buffer);
+  @override
+  State<ImageConversion> createState() => _ImageConversionState();
+}
 
-  late final imageMap = _convertImageToArray(edImage);
+class _ImageConversionState extends State<ImageConversion> {
+  final double THRESHOLD = 20;
+
+  final mapColours = {
+    'R': img.ColorInt32.rgb(0, 0, 0),
+    'W': img.ColorInt32.rgb(255, 255, 255)
+  };
+
+  late final imageMap = _convertImageToArray(widget.edImage);
 
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Image.memory(_leaveoutAllExceptRoutes(edImage).getBytes()));
+        child: Image.memory(
+      _colourMap(widget.edImage),
+      fit: BoxFit.scaleDown,
+      repeat: ImageRepeat.noRepeat,
+    ));
   }
 
   List<List<String>> _convertImageToArray(
@@ -43,41 +60,38 @@ class ImageConversion extends StatelessWidget {
     return area;
   }
 
-  /// could be change to be only linear time
-  img.Image _leaveoutAllExceptRoutes(
+  Uint8List _colourMap(
     final img.Image imgSource,
   ) {
-    final widthAndHeight = {'w': imgSource.width, 'h': imgSource.height};
-    final filteredImg = img.Image.from(imgSource);
+    final filteredImg = imgSource;
     for (int x = 0; x < filteredImg.width; x++) {
       for (int y = 0; y < filteredImg.height; y++) {
-        if (_isPixelSimilarToColour(filteredImg.getPixel(x, y))) {
+        if (_isPixelSimilarToColour(imgSource.getPixel(x, y))) {
           filteredImg.setPixel(x, y, img.ColorInt32.rgb(255, 255, 255));
         } else {
           filteredImg.setPixel(x, y, img.ColorInt32.rgb(0, 0, 0));
         }
       }
     }
-    imgSource.forEach((pixel) {});
-
-    return filteredImg;
+    return Library.imageAsBytes(filteredImg);
   }
 
-  img.Image _pixelsToImage(int w, int h, List<img.Pixel> pixels) {
-    if (w * h != pixels.length) {
+  img.Image _pixelsToImage(int w, int h, List<img.Color> colourPixels) {
+    if (w * h != colourPixels.length) {
       throw PictureSizeDoesNotMatchArrayLength();
     }
     img.Image image = img.Image(width: w, height: h);
-    for (int i = 0; i < pixels.length; i++) {
-      image.setPixel(i ~/ w, i % w, pixels[i]);
+    for (int i = 0; i < colourPixels.length; i += 5) {
+      var x = i ~/ w, y = i % w;
+      image.setPixel(x, y, colourPixels[i]);
     }
     return image;
   }
 
   bool _isPixelSimilarToColour(img.Pixel pixel, {Color? colour}) {
-    colour ??= routeColour;
-    return _euclideanDistanceBetweenColours(_getPixelColour(pixel), colour) <=
-        threshold;
+    return _euclideanDistanceBetweenColours(
+            _getPixelColour(pixel), colour ?? widget.routeColour) <=
+        THRESHOLD;
   }
 
   Color _getPixelColour(img.Pixel pixel) {
@@ -91,15 +105,4 @@ class ImageConversion extends StatelessWidget {
         pow(c2.green - c1.green, 2) +
         pow(c2.blue - c1.blue, 2));
   }
-
-  /*List<List<String>> _smoothMazeMap(List<List<String>> rw) {
-    for (var i = 0; i < rw.length; i++) {
-      for (var j = 0; j < rw[i].length; j++) {
-        if (rw[i][j] == "W") {
-          continue;
-        }
-
-      }
-    }
-  }*/
 }

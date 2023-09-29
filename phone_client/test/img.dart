@@ -12,10 +12,10 @@ class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
-  _MyAppState createState() => _MyAppState();
+  MyAppState createState() => MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -37,10 +37,10 @@ class CropSample extends StatefulWidget {
   const CropSample({super.key});
 
   @override
-  _CropSampleState createState() => _CropSampleState();
+  CropSampleState createState() => CropSampleState();
 }
 
-class _CropSampleState extends State<CropSample> {
+class CropSampleState extends State<CropSample> {
   static const _images = [
     'assets/images/city.png',
     'assets/images/lake.png',

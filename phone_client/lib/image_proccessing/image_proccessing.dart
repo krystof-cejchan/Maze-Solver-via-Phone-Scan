@@ -1,33 +1,24 @@
-import 'dart:typed_data';
-
-import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart' as img;
 import 'package:phone_client/image_proccessing/image_cropping.dart';
+import '../helpers/custom_image_class.dart' as custom;
 
 class ImageProccessing extends StatefulWidget {
-  const ImageProccessing({super.key, required this.bytes});
-  final Uint8List bytes;
+  const ImageProccessing({super.key, required this.image});
+  final custom.Image image;
 
   @override
   State<ImageProccessing> createState() => _ImageProccessingState();
 }
 
 class _ImageProccessingState extends State<ImageProccessing> {
-  late final Image imgEditable = Image.memory(widget.bytes);
-
   void _gotoImageEditing() {
     Navigator.push(
       context,
       MaterialPageRoute(
           builder: (context) => ImageCropping(
-                imageData: widget.bytes,
+                image: widget.image,
               )),
     );
-  }
-
-  static img.Image? convertBytesToImage(Uint8List B) {
-    return img.decodeImage(B);
   }
 
   @override
@@ -35,7 +26,7 @@ class _ImageProccessingState extends State<ImageProccessing> {
     return Scaffold(
         body: Center(
           child: Image(
-            image: Image.memory(widget.bytes).image,
+            image: Image.memory(widget.image.bytes).image,
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

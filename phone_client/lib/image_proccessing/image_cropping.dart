@@ -1,24 +1,23 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:phone_client/image_transformation/image2graph.dart';
+import 'package:phone_client/image_transformation/image2routes.dart';
+import '../helpers/custom_image_class.dart' as custom;
 
 class ImageCropping extends StatefulWidget {
-  const ImageCropping({Key? key, required this.imageData}) : super(key: key);
-  final Uint8List imageData;
+  const ImageCropping({Key? key, required this.image}) : super(key: key);
+  final custom.Image image;
 
   @override
-  State<ImageCropping> createState() => _ImageCroppingState(imageData);
+  State<ImageCropping> createState() => _ImageCroppingState();
 }
 
 class _ImageCroppingState extends State<ImageCropping>
     with WidgetsBindingObserver {
-  _ImageCroppingState(this.imageData);
-
-  final Uint8List imageData;
   final CropController _cropController = CropController();
 
-  late Uint8List _croppedData = imageData;
+  // ignore: unused_field
+  late Uint8List _croppedData = widget.image.bytes;
 
   final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
 
@@ -28,7 +27,7 @@ class _ImageCroppingState extends State<ImageCropping>
         body: GestureDetector(
           child: Crop(
             controller: _cropController,
-            image: imageData,
+            image: widget.image.bytes,
             onCropped: (croppedData) => setState(() {
               _croppedData = croppedData;
             }),
@@ -54,7 +53,9 @@ class _ImageCroppingState extends State<ImageCropping>
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageTransformation(imageData: _croppedData)),
+          //uncomment when cropping works
+          //builder: (context) => ImageConversion(custom.Image(_croppedData))),
+          builder: (context) => ImageConversion(widget.image)),
     );
   }
 }
