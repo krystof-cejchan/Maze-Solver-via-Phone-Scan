@@ -46,6 +46,7 @@ dependencies:
   crop_your_image: ^0.7.4
   image_size_getter: ^2.1.2
   device_info_plus: ^9.0.3
+  fluttertoast: ^8.2.2
 
 dev_dependencies:
   flutter_test:

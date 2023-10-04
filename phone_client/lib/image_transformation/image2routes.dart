@@ -1,5 +1,3 @@
-// ignore_for_file: non_constant_identifier_names
-
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -13,7 +11,7 @@ import '../helpers/custom_image_class.dart' as custom;
 class ImageConversion extends StatefulWidget {
   const ImageConversion._(this.customImage, this.edImage, this.routeColour);
 
-  factory ImageConversion(custom.Image customImage, {Color? colourOfRoute}) {
+  factory ImageConversion(custom.Image customImage, Color? colourOfRoute) {
     return ImageConversion._(customImage, customImage.image,
         colourOfRoute ?? const Color.fromARGB(206, 0, 0, 0));
   }

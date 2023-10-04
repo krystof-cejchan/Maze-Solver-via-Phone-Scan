@@ -5,8 +5,11 @@ import 'package:phone_client/image_transformation/image2routes.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
 class ImageCropping extends StatefulWidget {
-  const ImageCropping({Key? key, required this.image}) : super(key: key);
+  const ImageCropping(
+      {Key? key, required this.image, required this.pixelColour})
+      : super(key: key);
   final custom.Image image;
+  final Color pixelColour;
 
   @override
   State<ImageCropping> createState() => _ImageCroppingState();
@@ -19,7 +22,8 @@ class _ImageCroppingState extends State<ImageCropping>
   // ignore: unused_field
   late Uint8List _croppedData = widget.image.bytes;
 
-  final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
+  //final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
+  late final Color backgroundColour = widget.pixelColour;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +59,8 @@ class _ImageCroppingState extends State<ImageCropping>
       MaterialPageRoute(
           //uncomment when cropping works
           //builder: (context) => ImageConversion(custom.Image(_croppedData))),
-          builder: (context) => ImageConversion(widget.image)),
+          builder: (context) =>
+              ImageConversion(widget.image, widget.pixelColour)),
     );
   }
 }

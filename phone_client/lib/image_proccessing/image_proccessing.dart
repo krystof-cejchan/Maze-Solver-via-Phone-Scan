@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phone_client/image_proccessing/image_cropping.dart';
+import 'package:phone_client/image_proccessing/colour_picker.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
 class ImageProccessing extends StatefulWidget {
@@ -15,7 +15,7 @@ class _ImageProccessingState extends State<ImageProccessing> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageCropping(
+          builder: (context) => ColorPickerWidget(
                 image: widget.image,
               )),
     );

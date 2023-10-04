@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:phone_client/helpers/camera_resolution_px.dart';
-import 'package:phone_client/image_proccessing/image_proccessing.dart';
+import 'package:phone_client/image_proccessing/colour_picker.dart';
 import './helpers/custom_image_class.dart' as custom;
 import 'package:image/image.dart' as img;
 
@@ -53,7 +53,7 @@ class CameraScreenState extends State<CameraScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageProccessing(
+          builder: (context) => ColorPickerWidget(
                 image: data,
               )),
     );
