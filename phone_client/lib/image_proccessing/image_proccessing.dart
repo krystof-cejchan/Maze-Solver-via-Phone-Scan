@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:phone_client/image_proccessing/colour_picker.dart';
+import 'package:phone_client/image_proccessing/colour_picking/route_colour_picker.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
 class ImageProccessing extends StatefulWidget {

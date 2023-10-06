@@ -6,10 +6,13 @@ import '../helpers/custom_image_class.dart' as custom;
 
 class ImageCropping extends StatefulWidget {
   const ImageCropping(
-      {Key? key, required this.image, required this.pixelColour})
+      {Key? key,
+      required this.image,
+      required this.wallColour,
+      required this.routeColour})
       : super(key: key);
   final custom.Image image;
-  final Color pixelColour;
+  final Color wallColour, routeColour;
 
   @override
   State<ImageCropping> createState() => _ImageCroppingState();
@@ -22,8 +25,8 @@ class _ImageCroppingState extends State<ImageCropping>
   // ignore: unused_field
   late Uint8List _croppedData = widget.image.bytes;
 
-  //final Color backgroundColour = const Color.fromARGB(255, 0, 204, 17);
-  late final Color backgroundColour = widget.pixelColour;
+  late final Color wallColour = widget.wallColour,
+      routeColour = widget.routeColour;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,7 @@ class _ImageCroppingState extends State<ImageCropping>
             cornerDotBuilder: (size, edgeAlignment) =>
                 const DotControl(color: Color.fromARGB(255, 0, 204, 17)),
             interactive: true,
-            baseColor: backgroundColour,
+            baseColor: wallColour,
             fixArea: false,
           ),
         ),
@@ -59,8 +62,11 @@ class _ImageCroppingState extends State<ImageCropping>
       MaterialPageRoute(
           //uncomment when cropping works
           //builder: (context) => ImageConversion(custom.Image(_croppedData))),
-          builder: (context) =>
-              ImageConversion(widget.image, widget.pixelColour)),
+          builder: (context) => ImageConversion(
+                widget.image,
+                widget.wallColour,
+                widget.routeColour,
+              )),
     );
   }
 }

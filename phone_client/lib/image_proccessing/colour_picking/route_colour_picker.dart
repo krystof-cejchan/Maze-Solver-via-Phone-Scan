@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
-import 'package:phone_client/image_proccessing/image_cropping.dart';
-import '../helpers/custom_image_class.dart' as custom;
+import 'package:phone_client/helpers/lib_class.dart';
+import '../../helpers/custom_image_class.dart' as custom;
+import './wall_colour_picker.dart' as wall;
 
 class ColorPickerWidget extends StatefulWidget {
   const ColorPickerWidget({super.key, required this.image});
@@ -19,7 +20,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   GlobalKey paintKey = GlobalKey();
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
-  late Color pickedColour = Colors.red;
+  Color pickedRouteColour = Colors.black;
 
   late GlobalKey currentKey;
 
@@ -58,7 +59,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
       floatingActionButton: StreamBuilder<Color>(
         initialData: initColour,
         stream: _stateController.stream,
@@ -68,10 +69,10 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
             backgroundColor: colour,
             foregroundColor: _invertColour(colour),
             onPressed: _saveAndMoveOn,
-            icon: const Icon(Icons.check_box),
-            label: Text('$colour',
+            icon: const Icon(Icons.save_as),
+            label: Text('Save Route Colour',
                 style: TextStyle(
-                    color: colour, backgroundColor: _invertColour(colour))),
+                    color: _invertColour(colour), backgroundColor: colour)),
           );
         },
       ),
@@ -106,9 +107,9 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
 
     try {
       img.Pixel pixel = _image.image.getPixel(px.toInt(), py.toInt());
-      Color colour = pixelToARGBColour(pixel);
+      Color colour = Library.pixelColour(pixel);
       _stateController.add(colour);
-      pickedColour = colour;
+      pickedRouteColour = colour;
     } on RangeError {
       if (_haveFiveSecondsPassed()) {
         Fluttertoast.showToast(
@@ -135,13 +136,10 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageCropping(
+          builder: (context) => wall.ColorPickerWidget(
                 image: _image,
-                pixelColour: pickedColour,
+                routeColour: pickedRouteColour,
               )),
     );
   }
-
-  Color pixelToARGBColour(img.Pixel p) =>
-      Color.fromARGB(p.a.toInt(), p.r.toInt(), p.g.toInt(), p.b.toInt());
 }

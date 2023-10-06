@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:phone_client/image_scanning.dart';
+import 'package:phone_client/camera.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
