@@ -1,10 +1,12 @@
 class Node {
-  int x;
-  int y;
+  int x, y;
+  double f = 0, g = 0, h = 0;
   Node? parent;
-  late bool visited;
 
-  Node(this.x, this.y, this.parent) : visited = false;
+  Node(this.x, this.y);
+
+  @override
+  int get hashCode => x.hashCode ^ y.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -12,7 +14,4 @@ class Node {
       other.runtimeType == runtimeType &&
       other.x == x &&
       other.y == y;
-
-  @override
-  int get hashCode => x ~/ y;
 }

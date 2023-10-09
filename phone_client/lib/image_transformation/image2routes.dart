@@ -1,9 +1,10 @@
+import 'dart:js_util';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/route_algorithms/node.dart';
+import 'package:phone_client/route_algorithms/coordinate.dart';
 import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
@@ -174,10 +175,30 @@ class _DestinationPickerState extends State<_DestinationPicker> {
   }
 
   void _saveAndMoveOn() {
+    final pixels = widget.customImage.image;
+    final List<List<int>> grid = List.empty(growable: true);
+    for (int i = 0; i < pixels.width; i++) {
+      List<int> row = List.empty(growable: true);
+      for (int j = 0; j < pixels.height; j++) {
+        //if i&j are equal to picked start and destination add a special symbol
+        /*if(widget.start == i j){
+          row.add(7);
+          continue;
+        }*/
+        row.add(
+            Library.pixelColour(pixels.getPixel(i, j)) == Colors.black ? 1 : 0);
+      }
+      grid.add(row);
+    }
     // routedImage.image.pixe
     print(ShortestPathIn2dArray.findPath(
-        widget.customImage,
-        Node(widget.start.dx.toInt(), widget.start.dy.toInt(), null),
-        Node(crossCenter.dx.toInt(), crossCenter.dy.toInt(), null)));
+      grid,
+      Coordinate.recalculate(
+        widget.start.dx.toInt(),
+        widget.start.dy.toInt(),
+        crossCenter.dx.toInt(),
+        crossCenter.dy.toInt(),
+      ),
+    ));
   }
 }
