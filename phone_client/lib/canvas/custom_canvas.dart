@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CrossPainter extends CustomPainter {
+  static int fingerOffset = 50;
   Offset crossCenter;
   Color? color;
   CrossPainter(this.crossCenter, {this.color});
@@ -13,7 +14,8 @@ class CrossPainter extends CustomPainter {
       ..strokeWidth = 1.05;
 
     const crossLength = 20;
-    crossCenter = Offset(crossCenter.dx - 50, crossCenter.dy - 50);
+    crossCenter =
+        Offset(crossCenter.dx - fingerOffset, crossCenter.dy - fingerOffset);
     //horizontal line of the cross
     canvas.drawLine(
       Offset(crossCenter.dx - crossLength, crossCenter.dy),
