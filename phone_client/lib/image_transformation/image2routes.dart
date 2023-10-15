@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/route_algorithms/coordinate.dart';
+import 'package:phone_client/image_transformation/widget__normalized_path.dart';
+import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
+import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
@@ -228,24 +230,45 @@ class _DestinationPickerState extends State<_DestinationPicker> {
 
   void _saveAndMoveOn() {
     final pixels = widget.customImage.image;
+
     final List<List<int>> grid = List.empty(growable: true);
     for (int i = 0; i < pixels.width; i++) {
-      List<int> row = List.empty(growable: true);
+      List<int> col = List.filled(pixels.height, 0);
       for (int j = 0; j < pixels.height; j++) {
-        row.add(
-            Library.pixelColour(pixels.getPixel(i, j)) == Colors.black ? 1 : 0);
+        if (Library.pixelColour(pixels.getPixel(i, j)) == Colors.black) {
+          col[j] = 1;
+        }
       }
-      grid.add(row);
+      grid.add(col);
     }
 
-    print(ShortestPathIn2dArray.findPath(
-      grid,
-      Coordinate(
-        widget.start.dx.toInt(),
-        widget.start.dy.toInt(),
-        crossCenter.dx.toInt(),
-        crossCenter.dy.toInt(),
+    final shortestPath = ShortestPathIn2dArray.findPath(
+        grid,
+        Coordinates(
+          widget.start.dx.toInt(),
+          widget.start.dy.toInt(),
+          crossCenter.dx.toInt(),
+          crossCenter.dy.toInt(),
+        ));
+    var normalizedDirections = NormalizedPathDirections(shortestPath);
+    img.Image imageCopy = widget.customImage.image;
+
+    for (int i = 0; i < shortestPath.length; i++) {
+      final pieceOfPath = shortestPath[i];
+
+      imageCopy.setPixel(
+        pieceOfPath.xCoordinate,
+        pieceOfPath.yCoordinate,
+        img.ColorInt8.rgb(0, 255, 0),
+      );
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NormalizedPathWidget(normalizedDirections,
+            pathImage: custom.Image(imageCopy)),
       ),
-    ));
+    );
   }
 }

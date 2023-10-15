@@ -5,8 +5,7 @@ class CameraResolutionPixels {
   CameraResolutionPixels({required this.width, required this.height});
 
   factory CameraResolutionPixels.fromResolutionPreset(ResolutionPreset rp,
-      {bool? isIOS}) {
-    isIOS ??= false;
+      {bool isIOS = false}) {
     switch (rp) {
       case ResolutionPreset.high:
         return CameraResolutionPixels(width: 1280, height: 720);

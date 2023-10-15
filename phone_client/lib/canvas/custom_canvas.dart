@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class CrossPainter extends CustomPainter {
   static int fingerOffset = 50;
   Offset crossCenter;
-  Color? color;
-  CrossPainter(this.crossCenter, {this.color});
+  Color color;
+  CrossPainter(this.crossCenter, {this.color = Colors.pinkAccent});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color ?? Colors.pinkAccent
+      ..color = color
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 1.05;
 
