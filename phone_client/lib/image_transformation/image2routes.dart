@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/route_algorithms/node.dart';
+import 'package:phone_client/image_transformation/widget__normalized_path.dart';
+import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
+import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
 
@@ -41,8 +43,15 @@ class _ImageConversionState extends State<ImageConversion> {
     'W': img.ColorInt8.rgb(255, 255, 255),
   };
 
+  final GlobalKey imageKey = GlobalKey();
+  late GlobalKey currentKey;
   late custom.Image routedImage = _colourMap(widget.edImage);
-  Offset crossCenter = Offset.zero;
+  Offset crossCenter = Offset.zero, localCrossCenter = Offset.zero;
+  @override
+  void initState() {
+    currentKey = imageKey;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,10 +59,12 @@ class _ImageConversionState extends State<ImageConversion> {
         body: Center(
           child: GestureDetector(
             onTapDown: (details) => setState(() {
-              crossCenter = details.localPosition;
+              crossCenter = recalibrateOffset(details.globalPosition);
+              localCrossCenter = details.localPosition;
             }),
             onPanUpdate: (details) => setState(() {
-              crossCenter = details.localPosition;
+              crossCenter = recalibrateOffset(details.globalPosition);
+              localCrossCenter = details.localPosition;
             }),
             child: Stack(
               children: [
@@ -61,10 +72,11 @@ class _ImageConversionState extends State<ImageConversion> {
                   routedImage.bytes,
                   fit: BoxFit.scaleDown,
                   repeat: ImageRepeat.noRepeat,
+                  key: imageKey,
                 ),
                 CustomPaint(
                   size: const Size(200, 200),
-                  painter: CrossPainter(crossCenter,
+                  painter: CrossPainter(localCrossCenter,
                       color: const Color.fromARGB(255, 29, 167, 236)),
                 ),
               ],
@@ -98,6 +110,19 @@ class _ImageConversionState extends State<ImageConversion> {
     return custom.Image(filteredImg);
   }
 
+  Offset recalibrateOffset(Offset globalPosition) {
+    currentKey = imageKey;
+    RenderBox box = currentKey.currentContext!.findRenderObject() as RenderBox;
+    Offset localPosition = box.globalToLocal(Offset(
+        globalPosition.dx - CrossPainter.fingerOffset,
+        globalPosition.dy - CrossPainter.fingerOffset));
+    double widgetScale = box.size.width / routedImage.w;
+    double px = localPosition.dx / widgetScale,
+        py = localPosition.dy / widgetScale;
+
+    return Offset(px, py);
+  }
+
   ///true if pixel colour is more likely to be a route than a wall
   bool _isPixelRepresentingRoute(Color color) =>
       _euclideanDistanceBetweenColours(color, widget.routeColour) <
@@ -114,22 +139,36 @@ class _ImageConversionState extends State<ImageConversion> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => _DestinationPicker(routedImage, crossCenter)),
+          builder: (context) =>
+              _DestinationPicker(routedImage, localCrossCenter, crossCenter)),
     );
   }
 }
 
 ///another class for choosing the destination in the image
 class _DestinationPicker extends StatefulWidget {
-  const _DestinationPicker(this.customImage, this.start);
+  const _DestinationPicker(this.customImage, this.localCrossOffset, this.start);
   final custom.Image customImage;
+
+  /// local coordinates to show the cross
+  final Offset localCrossOffset;
+
+  /// x and y of the pixel picked as the start
   final Offset start;
   @override
   State<_DestinationPicker> createState() => _DestinationPickerState();
 }
 
 class _DestinationPickerState extends State<_DestinationPicker> {
-  Offset crossCenter = Offset.zero;
+  Offset crossCenter = Offset.zero, localCrossCenter = Offset.zero;
+  final GlobalKey imageKey = GlobalKey();
+  late GlobalKey currentKey;
+
+  @override
+  void initState() {
+    currentKey = imageKey;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +176,12 @@ class _DestinationPickerState extends State<_DestinationPicker> {
         body: Center(
           child: GestureDetector(
             onTapDown: (details) => setState(() {
-              crossCenter = details.localPosition;
+              crossCenter = recalibrateOffset(details.globalPosition);
+              localCrossCenter = details.localPosition;
             }),
             onPanUpdate: (details) => setState(() {
-              crossCenter = details.localPosition;
+              crossCenter = recalibrateOffset(details.globalPosition);
+              localCrossCenter = details.localPosition;
             }),
             child: Stack(
               children: [
@@ -148,15 +189,16 @@ class _DestinationPickerState extends State<_DestinationPicker> {
                   widget.customImage.bytes,
                   fit: BoxFit.scaleDown,
                   repeat: ImageRepeat.noRepeat,
+                  key: imageKey,
                 ),
                 CustomPaint(
                   size: const Size(200, 200),
-                  painter: CrossPainter(crossCenter),
+                  painter: CrossPainter(localCrossCenter),
                 ),
                 CustomPaint(
                   size: const Size(200, 200),
                   painter: CrossPainter(
-                    widget.start,
+                    widget.localCrossOffset,
                     color: const Color.fromARGB(255, 29, 167, 236),
                   ),
                 ),
@@ -173,11 +215,60 @@ class _DestinationPickerState extends State<_DestinationPicker> {
             icon: const Icon(Icons.route_outlined)));
   }
 
+  Offset recalibrateOffset(Offset globalPosition) {
+    currentKey = imageKey;
+    RenderBox box = currentKey.currentContext!.findRenderObject() as RenderBox;
+    Offset localPosition = box.globalToLocal(Offset(
+        globalPosition.dx - CrossPainter.fingerOffset,
+        globalPosition.dy - CrossPainter.fingerOffset));
+    double widgetScale = box.size.width / widget.customImage.w;
+    double px = localPosition.dx / widgetScale,
+        py = localPosition.dy / widgetScale;
+
+    return Offset(px, py);
+  }
+
   void _saveAndMoveOn() {
-    // routedImage.image.pixe
-    print(ShortestPathIn2dArray.findPath(
-        widget.customImage,
-        Node(widget.start.dx.toInt(), widget.start.dy.toInt(), null),
-        Node(crossCenter.dx.toInt(), crossCenter.dy.toInt(), null)));
+    final pixels = widget.customImage.image;
+
+    final List<List<int>> grid = List.empty(growable: true);
+    for (int i = 0; i < pixels.width; i++) {
+      List<int> col = List.filled(pixels.height, 0);
+      for (int j = 0; j < pixels.height; j++) {
+        if (Library.pixelColour(pixels.getPixel(i, j)) == Colors.black) {
+          col[j] = 1;
+        }
+      }
+      grid.add(col);
+    }
+
+    final shortestPath = ShortestPathIn2dArray.findPath(
+        grid,
+        Coordinates(
+          widget.start.dx.toInt(),
+          widget.start.dy.toInt(),
+          crossCenter.dx.toInt(),
+          crossCenter.dy.toInt(),
+        ));
+    var normalizedDirections = NormalizedPathDirections(shortestPath);
+    img.Image imageCopy = widget.customImage.image;
+
+    for (int i = 0; i < shortestPath.length; i++) {
+      final pieceOfPath = shortestPath[i];
+
+      imageCopy.setPixel(
+        pieceOfPath.xCoordinate,
+        pieceOfPath.yCoordinate,
+        img.ColorInt8.rgb(0, 255, 0),
+      );
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NormalizedPathWidget(normalizedDirections,
+            pathImage: custom.Image(imageCopy)),
+      ),
+    );
   }
 }

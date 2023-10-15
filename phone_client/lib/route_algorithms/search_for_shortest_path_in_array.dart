@@ -1,57 +1,88 @@
-import 'dart:collection';
-
-import 'package:phone_client/route_algorithms/node.dart';
-
-import '../helpers/custom_image_class.dart' as custom;
+import 'package:collection/collection.dart';
+import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
 
 mixin ShortestPathIn2dArray {
   ///an algorithm to find the shortest path from a starting Node to an endNode
   ///in a black and white image
   ///(where white pixels represent a route and black pixels represent walls)
-  static List<Node> findPath(custom.Image image, Node start, Node end) {
-    final int numRows = image.h;
-    final int numCols = image.w;
-    final int length = numCols * numRows;
-    List<int> row = List.of([-1, 0, 0, 1], growable: false);
-    List<int> col = List.of([0, -1, 1, 0], growable: false);
-    List<Node> path = List.empty(growable: true);
-    Queue<Node> queue = Queue();
-    queue.add(start
-      ..parent = null
-      ..visited = true);
+  static List<Coordinate> findPath(
+      List<List<int>> grid, Coordinates coordinates) {
+    final openList = PriorityQueue<Node>((a, b) => (a.f - b.f).toInt());
+    final closedList = <Node, Node>{};
+    final startNode = Node(coordinates.startX, coordinates.startY);
+    final endNode = Node(coordinates.endX, coordinates.endY);
 
-    while (queue.isNotEmpty) {
-      Node curr = queue.removeFirst();
-      if (curr == end) {
-        _findPath(curr, path);
-        return path;
+    openList.add(startNode);
+
+    while (openList.isNotEmpty) {
+      final currentNode = openList.removeFirst();
+      if (currentNode == endNode) {
+        return _buildPath(currentNode, grid);
       }
 
-      for (int i = 0; i < row.length; i++) {
-        //can't use .. *i; the variable is just a dummy
-        start.x = start.x + row[i] * i;
-        start.y = start.y + col[i] * i;
+      closedList[currentNode] = currentNode;
 
-        if (_isValid(start.x, start.y, length)) {
-          Node next = Node(start.x, start.y, curr);
-          if (!next.visited) {
-            queue.add(next..visited = true);
+      for (final neighbor in _getNeighbors(grid, currentNode)) {
+        if (closedList.containsKey(neighbor)) continue;
+
+        final tentativeG = currentNode.g + 1.0; // Cardinal movement cost
+
+        if (!openList.contains(neighbor) || tentativeG < neighbor.g) {
+          neighbor.parent = currentNode;
+          neighbor.g = tentativeG;
+          neighbor.h = _heuristic(neighbor, endNode);
+          neighbor.f = neighbor.g + neighbor.h;
+
+          if (!openList.contains(neighbor)) {
+            openList.add(neighbor);
           }
         }
       }
     }
-    return [];
+
+    return []; // No path found
   }
 
-// Utility function to find path from source to destination
-  static void _findPath(Node? node, List<Node> path) {
-    if (node != null) {
-      _findPath(node.parent, path);
-      path.add(node);
+  ///Manhattan distance heuristic for horizontal and vertical movement
+  static double _heuristic(Node a, Node b) {
+    return (a.x - b.x).abs().toDouble() + (a.y - b.y).abs().toDouble();
+  }
+
+  static List<Node> _getNeighbors(List<List<int>> grid, Node node) {
+    final neighbors = <Node>[];
+    final directions = [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ];
+
+    for (final List<int> dir in directions) {
+      final int x = node.x + dir[0];
+      final int y = node.y + dir[1];
+
+      if (x >= 0 &&
+          x < grid.length &&
+          y >= 0 &&
+          y < grid[0].length &&
+          grid[x][y] == 0) {
+        neighbors.add(Node(x, y));
+      }
     }
+
+    return neighbors;
   }
 
-  static bool _isValid(int x, int y, int N) {
-    return (x >= 0 && x < N) && (y >= 0 && y < N);
+  static List<Coordinate> _buildPath(Node node, List<List<int>> grid) {
+    final path = <Coordinate>[];
+    var current = node;
+
+    while (current.parent != null) {
+      path.add(current);
+      current = current.parent!;
+    }
+
+    path.add(current); // Add the start node
+    return path.reversed.toList();
   }
 }
