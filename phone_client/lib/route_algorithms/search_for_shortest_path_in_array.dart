@@ -2,9 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
 
 mixin ShortestPathIn2dArray {
-  ///an algorithm to find the shortest path from a starting Node to an endNode
-  ///in a black and white image
-  ///(where white pixels represent a route and black pixels represent walls)
+  ///an algorithm to find the shortest path from a starting [coordinates] to an end [coordinates]
+  ///in a 2d matrix   (where 0 represent a route and 1 represent walls)
   static List<Coordinate> findPath(
       List<List<int>> grid, Coordinates coordinates) {
     final openList = PriorityQueue<Node>((a, b) => (a.f - b.f).toInt());
@@ -43,11 +42,12 @@ mixin ShortestPathIn2dArray {
     return []; // No path found
   }
 
-  ///Manhattan distance heuristic for horizontal and vertical movement
+  ///manhattan distance heuristic for horizontal and vertical movement
   static double _heuristic(Node a, Node b) {
     return (a.x - b.x).abs().toDouble() + (a.y - b.y).abs().toDouble();
   }
 
+  /// returns neighbors from [directions]
   static List<Node> _getNeighbors(List<List<int>> grid, Node node) {
     final neighbors = <Node>[];
     final directions = [
@@ -73,6 +73,7 @@ mixin ShortestPathIn2dArray {
     return neighbors;
   }
 
+  /// builds the path
   static List<Coordinate> _buildPath(Node node, List<List<int>> grid) {
     final path = <Coordinate>[];
     var current = node;

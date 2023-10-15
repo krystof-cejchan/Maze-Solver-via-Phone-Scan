@@ -10,6 +10,7 @@ class NormalizedPathWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _NormalizedPathState();
 }
 
+/// shows the shortest path with its directions
 class _NormalizedPathState extends State<NormalizedPathWidget> {
   @override
   Widget build(BuildContext context) {

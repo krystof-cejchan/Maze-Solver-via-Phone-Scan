@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// custom canvas for painting crosses
+/// used for marking the start and end of a route
 class CrossPainter extends CustomPainter {
   static int fingerOffset = 50;
   Offset crossCenter;

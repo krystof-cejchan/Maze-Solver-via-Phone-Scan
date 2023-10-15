@@ -65,30 +65,32 @@ class CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-            body: FutureBuilder<void>(
-              future: _initializeControllerFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: CameraPreview(_controller),
-                      ),
-                    ],
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
-            floatingActionButton: FloatingActionButton.extended(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.black87,
-                onPressed: _captureAndSaveImage,
-                label: const Text('Take a photo'),
-                icon: const Icon(Icons.photo_camera_front_rounded))));
+      child: Scaffold(
+        body: FutureBuilder<void>(
+          future: _initializeControllerFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return Column(
+                children: [
+                  Expanded(
+                    child: CameraPreview(_controller),
+                  ),
+                ],
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.black87,
+          onPressed: _captureAndSaveImage,
+          label: const Text('Take a photo'),
+          icon: const Icon(Icons.photo_camera_front_rounded),
+        ),
+      ),
+    );
   }
 }

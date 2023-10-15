@@ -102,7 +102,8 @@ class _ImageConversionState extends State<ImageConversion> {
             x,
             y,
             mapColours[_isPixelRepresentingRoute(
-                    Library.pixelColour(imgSource.getPixel(x, y)))
+              Library.pixelColour(imgSource.getPixel(x, y)),
+            )
                 ? 'R'
                 : 'W']!);
       }
@@ -242,7 +243,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
       grid.add(col);
     }
 
-    final shortestPath = ShortestPathIn2dArray.findPath(
+    final List<Coordinate> shortestPath = ShortestPathIn2dArray.findPath(
         grid,
         Coordinates(
           widget.start.dx.toInt(),
@@ -250,7 +251,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
           crossCenter.dx.toInt(),
           crossCenter.dy.toInt(),
         ));
-    var normalizedDirections = NormalizedPathDirections(shortestPath);
+    final normalizedDirections = NormalizedPathDirections(shortestPath);
     img.Image imageCopy = widget.customImage.image;
 
     for (int i = 0; i < shortestPath.length; i++) {

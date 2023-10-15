@@ -24,16 +24,18 @@ class _ImageProccessingState extends State<ImageProccessing> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-          child: Image(
-            image: Image.memory(widget.image.bytes).image,
-          ),
+      body: Center(
+        child: Image(
+          image: Image.memory(widget.image.bytes).image,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton.small(
-            backgroundColor: Colors.blueAccent,
-            foregroundColor: Colors.black87,
-            onPressed: _gotoImageEditing,
-            child: const Icon(Icons.mode_edit_sharp)));
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton.small(
+        backgroundColor: Colors.blueAccent,
+        foregroundColor: Colors.black87,
+        onPressed: _gotoImageEditing,
+        child: const Icon(Icons.mode_edit_sharp),
+      ),
+    );
   }
 }

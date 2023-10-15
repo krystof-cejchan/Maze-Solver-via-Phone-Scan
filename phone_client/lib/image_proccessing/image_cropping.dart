@@ -31,29 +31,30 @@ class _ImageCroppingState extends State<ImageCropping>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: GestureDetector(
-          child: Crop(
-            controller: _cropController,
-            image: widget.image.bytes,
-            onCropped: (croppedData) => setState(() {
-              _croppedData = croppedData;
-            }),
-            initialAreaBuilder: (rect) => Rect.fromLTRB(rect.left + 54,
-                rect.top + 62, rect.right - 54, rect.bottom - 62),
-            cornerDotBuilder: (size, edgeAlignment) =>
-                const DotControl(color: Color.fromARGB(255, 0, 204, 17)),
-            interactive: true,
-            baseColor: wallColour,
-            fixArea: false,
-          ),
+      body: GestureDetector(
+        child: Crop(
+          controller: _cropController,
+          image: widget.image.bytes,
+          onCropped: (croppedData) => setState(() {
+            _croppedData = croppedData;
+          }),
+          initialAreaBuilder: (rect) => Rect.fromLTRB(
+              rect.left + 54, rect.top + 62, rect.right - 54, rect.bottom - 62),
+          cornerDotBuilder: (size, edgeAlignment) =>
+              const DotControl(color: Color.fromARGB(255, 0, 204, 17)),
+          interactive: true,
+          baseColor: wallColour,
+          fixArea: false,
         ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniEndDocked,
-        floatingActionButton: FloatingActionButton.small(
-            backgroundColor: Colors.black87,
-            foregroundColor: const Color.fromARGB(255, 75, 189, 0),
-            onPressed: () => _crop(context),
-            child: const Icon(Icons.done_all_rounded)));
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+      floatingActionButton: FloatingActionButton.small(
+        backgroundColor: Colors.black87,
+        foregroundColor: const Color.fromARGB(255, 75, 189, 0),
+        onPressed: () => _crop(context),
+        child: const Icon(Icons.done_all_rounded),
+      ),
+    );
   }
 
   void _crop(BuildContext context) {

@@ -36,6 +36,7 @@ class NormalizedPathDirections {
     return normalizedDirections;
   }
 
+  /// returns all directions based on every pixel and its previous pixel
   List<Directions> _allDirections() {
     List<Directions> allDirections = List.empty(growable: true);
     for (int i = 1; i < pathCoordinates.length; i++) {
@@ -45,6 +46,7 @@ class NormalizedPathDirections {
     return allDirections;
   }
 
+  /// calculates Direction a pixel has taken since its previous pixel
   Directions _directionFromPreviousCoordinates(
       Coordinate curr, Coordinate prev) {
     if (curr.xCoordinate > prev.xCoordinate) {

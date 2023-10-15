@@ -90,7 +90,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   }
 
   void searchPixel(Offset globalPosition) {
-    if (_image.isValid() == false) {
+    if (_image.isNotValid()) {
       return;
     }
     currentKey = imageKey;

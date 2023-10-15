@@ -13,4 +13,8 @@ class Image {
   bool isValid() {
     return image.isValid;
   }
+
+  bool isNotValid() {
+    return !isValid();
+  }
 }
