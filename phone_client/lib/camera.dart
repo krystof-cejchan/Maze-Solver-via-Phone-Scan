@@ -44,9 +44,10 @@ class CameraScreenState extends State<CameraScreen> {
       await _controller.setFocusMode(FocusMode.auto);
 
       final xFile = await _controller.takePicture();
-      img.Image image = img.decodeImage(File(xFile.path).readAsBytesSync())!;
-      custom.Image customImage = custom.Image(image);
-      if (image.isValid) {
+      custom.Image customImage =
+          custom.Image(img.decodeImage(File(xFile.path).readAsBytesSync())!);
+
+      if (customImage.isValid()) {
         _openImageInNewRoute(customImage);
       }
     }
@@ -56,9 +57,10 @@ class CameraScreenState extends State<CameraScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ColorPickerWidget(
-                image: data,
-              )),
+        builder: (context) => ColorPickerWidget(
+          image: data,
+        ),
+      ),
     );
   }
 
@@ -88,7 +90,7 @@ class CameraScreenState extends State<CameraScreen> {
           foregroundColor: Colors.black87,
           onPressed: _captureAndSaveImage,
           label: const Text('Take a photo'),
-          icon: const Icon(Icons.photo_camera_front_rounded),
+          icon: const Icon(Icons.camera_alt_rounded),
         ),
       ),
     );

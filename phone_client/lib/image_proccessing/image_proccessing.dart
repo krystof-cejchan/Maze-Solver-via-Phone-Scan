@@ -34,7 +34,7 @@ class _ImageProccessingState extends State<ImageProccessing> {
         backgroundColor: Colors.blueAccent,
         foregroundColor: Colors.black87,
         onPressed: _gotoImageEditing,
-        child: const Icon(Icons.mode_edit_sharp),
+        child: const Icon(Icons.save_sharp),
       ),
     );
   }

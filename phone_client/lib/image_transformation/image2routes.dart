@@ -177,12 +177,12 @@ class _DestinationPickerState extends State<_DestinationPicker> {
         body: Center(
           child: GestureDetector(
             onTapDown: (details) => setState(() {
-              crossCenter = recalibrateOffset(details.globalPosition);
-              localCrossCenter = details.localPosition;
+              _onGuestureDetected(
+                  details.globalPosition, details.localPosition);
             }),
             onPanUpdate: (details) => setState(() {
-              crossCenter = recalibrateOffset(details.globalPosition);
-              localCrossCenter = details.localPosition;
+              _onGuestureDetected(
+                  details.globalPosition, details.localPosition);
             }),
             child: Stack(
               children: [
@@ -216,12 +216,20 @@ class _DestinationPickerState extends State<_DestinationPicker> {
             icon: const Icon(Icons.route_outlined)));
   }
 
+  void _onGuestureDetected(Offset globalPosition, Offset localPosition) {
+    crossCenter = recalibrateOffset(globalPosition);
+    localCrossCenter = localPosition;
+  }
+
   Offset recalibrateOffset(Offset globalPosition) {
     currentKey = imageKey;
     RenderBox box = currentKey.currentContext!.findRenderObject() as RenderBox;
-    Offset localPosition = box.globalToLocal(Offset(
+    Offset localPosition = box.globalToLocal(
+      Offset(
         globalPosition.dx - CrossPainter.fingerOffset,
-        globalPosition.dy - CrossPainter.fingerOffset));
+        globalPosition.dy - CrossPainter.fingerOffset,
+      ),
+    );
     double widgetScale = box.size.width / widget.customImage.w;
     double px = localPosition.dx / widgetScale,
         py = localPosition.dy / widgetScale;
@@ -243,20 +251,23 @@ class _DestinationPickerState extends State<_DestinationPicker> {
       grid.add(col);
     }
 
-    final List<Coordinate> shortestPath = ShortestPathIn2dArray.findPath(
-        grid,
-        Coordinates(
-          widget.start.dx.toInt(),
-          widget.start.dy.toInt(),
-          crossCenter.dx.toInt(),
-          crossCenter.dy.toInt(),
-        ));
-    final normalizedDirections = NormalizedPathDirections(shortestPath);
+    final List<Coordinate> shortestPath = PathInMatrix(
+      grid,
+      Coordinates(
+        widget.start.dx.toInt(),
+        widget.start.dy.toInt(),
+        crossCenter.dx.toInt(),
+        crossCenter.dy.toInt(),
+      ),
+    ).foundPath;
+
+    final normalizedDirections =
+        NormalizedPathDirections(shortestPath, widget.customImage);
+
     img.Image imageCopy = widget.customImage.image;
 
     for (int i = 0; i < shortestPath.length; i++) {
       final pieceOfPath = shortestPath[i];
-
       imageCopy.setPixel(
         pieceOfPath.xCoordinate,
         pieceOfPath.yCoordinate,

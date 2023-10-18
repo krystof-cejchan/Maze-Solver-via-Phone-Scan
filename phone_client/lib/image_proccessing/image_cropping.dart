@@ -52,7 +52,7 @@ class _ImageCroppingState extends State<ImageCropping>
         backgroundColor: Colors.black87,
         foregroundColor: const Color.fromARGB(255, 75, 189, 0),
         onPressed: () => _crop(context),
-        child: const Icon(Icons.done_all_rounded),
+        child: const Icon(Icons.crop_rounded),
       ),
     );
   }

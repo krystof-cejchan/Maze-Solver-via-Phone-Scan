@@ -69,7 +69,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
             backgroundColor: colour,
             foregroundColor: _invertColour(colour),
             onPressed: _saveAndMoveOn,
-            icon: const Icon(Icons.save_as),
+            icon: const Icon(Icons.colorize_outlined),
             label: Text('Save Route Colour',
                 style: TextStyle(
                     color: _invertColour(colour), backgroundColor: colour)),
