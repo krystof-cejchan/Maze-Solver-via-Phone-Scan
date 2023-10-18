@@ -19,20 +19,18 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
         Image.memory(widget.pathImage!.bytes),
         Flexible(
           child: Text(
-            widget.normDirections.mappedDirectionsToCoordinates
-                .map((e) => e.directions)
-                .toString(),
+            widget.normDirections.mappedDirectionsToCoordinates.toString(),
             style: const TextStyle(fontSize: 12),
           ),
         ),
-        Flexible(
+        /*Flexible(
           child: Text(
             widget.normDirections
                 .convertDirectionsToRobotInstructions()
                 .toString(),
             style: const TextStyle(fontSize: 12),
           ),
-        )
+        )*/
       ],
     );
   }

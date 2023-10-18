@@ -4,65 +4,67 @@ import 'package:flutter/material.dart' show Colors;
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/helpers/lib_class.dart';
 
-import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
+import 'classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
+import 'classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import 'classes,enums,exceptions_for_route_algorithm/exceptions/wrong_followup_direction.dart';
+import 'classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordinates.dart';
 
 class NormalizedPathDirections {
-  final List<Coordinate> pathCoordinates;
+  final List<Coordinate> _pathCoordinates;
   final custom.Image imageMaze;
   late final Queue<MappedDirectionsToCoordinates> mappedDirectionsToCoordinates;
-  NormalizedPathDirections(this.pathCoordinates, this.imageMaze) {
+  NormalizedPathDirections(this._pathCoordinates, this.imageMaze) {
     mappedDirectionsToCoordinates = _normalizedDirections();
   }
 
   /// Normalizes a list of directions by removing consecutive identical directions
   /// until a specified threshold is reached.
-  Queue<MappedDirectionsToCoordinates> _normalizedDirections({
-    int threshold = 25,
-    bool crossroadPatch = false,
-  }) {
-    final Queue<Directions> history =
-        Queue<Directions>(); //history of [Directions] looped through
+  Queue<MappedDirectionsToCoordinates> _normalizedDirections(
+      {int threshold = 25}) {
+    //history of [Directions] looped through
+    final Queue<Directions> history = Queue<Directions>();
 
-    final Queue<MappedDirectionsToCoordinates> mapDirToCoo =
-        Queue(); //queue holding a Directions item and list of Coordinates that go in that Direction
+    //queue holding a Directions item and list of Coordinates that go in that Direction
+    final Queue<MappedDirectionsToCoordinates> mapDirToCoo = Queue();
 
     Directions curr; // dummy for saving current Directions
 
-    for (int i = 1; i < pathCoordinates.length; i++) {
+    for (int i = 1; i < _pathCoordinates.length; i++) {
       final S = i - 1; // constant for saving starting index of a direction
 
+      // calculated new direction from the Coordinates of index [i] and Coordinates of index [S]
       var currDir = _directionFromPreviousCoordinates(
-        pathCoordinates[i],
-        pathCoordinates[S],
-      ); // calculated new direction from the Coordinates of index [i] and Coordinates of index [S]
+        _pathCoordinates[i],
+        _pathCoordinates[S],
+      );
 
+      // a record added to the history and [curr] is assigned the value of [currDir]
       history.add(
         curr = currDir,
-      ); // a record added to the history and [curr] is assigned the value of [currDir]
+      );
 
-      bool allEqual = history.every(
-        (element) => element == curr,
-      ); // checks whether all elements in history are equal to the [curr]
+      // checks whether all elements in history are equal to the [curr]
+      bool allEqual = history.every((element) => element == curr);
+
       if (allEqual && history.length >= threshold) {
         /* while:
          increased [i] is lower than the length of [pathCoordinates] and newly calculated direction is equal to [curr]
          then:
          continue*/
-        while (++i < pathCoordinates.length &&
+        while (++i < _pathCoordinates.length &&
             (currDir = _directionFromPreviousCoordinates(
-                  pathCoordinates[i],
-                  pathCoordinates[i - 1],
+                  _pathCoordinates[i],
+                  _pathCoordinates[i - 1],
                 )) ==
-                curr) {
-          continue;
-        }
+                curr) {}
         // if nothing has been added to the map yet or last direction is not equal to [currDir]
         // then add {currDir, sublist of all coordinates with that direction}
-        if (mapDirToCoo.isEmpty || mapDirToCoo.last.directions != currDir) {
+        if (mapDirToCoo.isEmpty || mapDirToCoo.last.directions != curr) {
           mapDirToCoo.add(MappedDirectionsToCoordinates(
               curr,
               List<Coordinate>.from(
-                pathCoordinates.sublist(S, --i),
+                _pathCoordinates.sublist(S, --i),
               )));
         }
         // clear history and continue
@@ -75,55 +77,7 @@ class NormalizedPathDirections {
       }
     }
 
-    /*if (!crossroadPatch || mapDirToCoo.length <= 1) */ return mapDirToCoo;
-
-    Queue<MappedDirectionsToCoordinates> patchedMap = Queue();
-
-    MappedDirectionsToCoordinates map = mapDirToCoo.removeFirst(), nextMap;
-    while (mapDirToCoo.isNotEmpty) {
-      nextMap = mapDirToCoo.removeFirst();
-      int S = 0;
-      patchedMap.add(map);
-      for (int i = 0; i < map.coordinates.length; i += 5) {
-        var currCoo = map.coordinates[i];
-        int counter = 0, x = currCoo.xCoordinate, y = currCoo.yCoordinate;
-        while (_isValidRoute(x, y)) {
-          switch (nextMap.directions) {
-            case Directions.down:
-              y++;
-              break;
-            case Directions.up:
-              y--;
-              break;
-            case Directions.right:
-              x++;
-              break;
-            case Directions.left:
-              x--;
-              break;
-          }
-          counter++;
-        }
-
-        if (counter <= 100) {
-          continue;
-        }
-
-        patchedMap.add(
-          MappedDirectionsToCoordinates(
-            map.directions,
-            List<Coordinate>.from(
-              map.coordinates.sublist(S, S = i),
-            ),
-          ),
-        );
-      }
-      map = nextMap;
-    }
-    patchedMap.forEach((element) {
-      print(element.toString());
-    });
-    return patchedMap;
+    return mapDirToCoo;
   }
 
   /// checks whether x and y are not border coordinates and whether the pixel places on these coordinates represents route
@@ -134,19 +88,6 @@ class NormalizedPathDirections {
         y > 0 &&
         Library.pixelColour(imageMaze.image.getPixel(x, y)) == Colors.white;
   }
-  /* Queue<Directions> _crossroadPatch(Queue<Directions> directions) {
-    for (Coordinate coo in pathCoordinates) {}
-  }*/
-
-  /// returns all directions based on every pixel and its previous pixel
-/*  List<Directions> _allDirections() {
-    List<Directions> allDirections = List.empty(growable: true);
-    for (int i = 1; i < pathCoordinates.length; i++) {
-      allDirections.add(_directionFromPreviousCoordinates(
-          pathCoordinates[i], pathCoordinates[i - 1]));
-    }
-    return allDirections;
-  }*/
 
   /// calculates Direction a pixel has taken since its previous pixel
   Directions _directionFromPreviousCoordinates(
@@ -177,10 +118,9 @@ class NormalizedPathDirections {
 
   RobotInstructions _calculateRobotInstructionBasedOnPreviousDirection(
       Directions prevDirection, Directions nextDirection) {
-    /*  if (prevDirection.horizontal == nextDirection.horizontal) {
+    if (prevDirection.horizontal == nextDirection.horizontal) {
       throw WrongFollowupDirectionException();
-    }*/
-    if (prevDirection == nextDirection) return RobotInstructions.pass;
+    }
     switch (prevDirection) {
       case Directions.down:
         return nextDirection == Directions.right

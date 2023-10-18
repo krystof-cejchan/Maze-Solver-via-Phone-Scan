@@ -1,5 +1,8 @@
 import 'package:collection/collection.dart';
-import 'package:phone_client/route_algorithms/classes_for_route_algorithm.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+
+import 'classes,enums,exceptions_for_route_algorithm/node.dart';
 
 class PathInMatrix {
   late final List<Coordinate> foundPath;

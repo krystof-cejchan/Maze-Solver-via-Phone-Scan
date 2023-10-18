@@ -1,0 +1,1 @@
+class WrongFollowupDirectionException implements Exception {}
