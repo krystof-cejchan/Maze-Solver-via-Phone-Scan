@@ -12,10 +12,12 @@ import 'classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordi
 
 class NormalizedPathDirections {
   final List<Coordinate> _pathCoordinates;
-  final custom.Image imageMaze;
+  final custom.Image _imageMaze;
   late final Queue<MappedDirectionsToCoordinates> mappedDirectionsToCoordinates;
-  NormalizedPathDirections(this._pathCoordinates, this.imageMaze) {
+  late final Queue<RobotInstructions> robotInstructions;
+  NormalizedPathDirections(this._pathCoordinates, this._imageMaze) {
     mappedDirectionsToCoordinates = _normalizedDirections();
+    robotInstructions = _convertDirectionsToRobotInstructions();
   }
 
   /// Normalizes a list of directions by removing consecutive identical directions
@@ -76,17 +78,16 @@ class NormalizedPathDirections {
         history.clear();
       }
     }
-
     return mapDirToCoo;
   }
 
   /// checks whether x and y are not border coordinates and whether the pixel places on these coordinates represents route
   bool _isValidRoute(int x, int y) {
-    return x < imageMaze.w &&
+    return x < _imageMaze.w &&
         x > 0 &&
-        y < imageMaze.h &&
+        y < _imageMaze.h &&
         y > 0 &&
-        Library.pixelColour(imageMaze.image.getPixel(x, y)) == Colors.white;
+        Library.pixelColour(_imageMaze.image.getPixel(x, y)) == Colors.white;
   }
 
   /// calculates Direction a pixel has taken since its previous pixel
@@ -103,9 +104,9 @@ class NormalizedPathDirections {
     }
   }
 
-  Queue<RobotInstructions> convertDirectionsToRobotInstructions() {
+  Queue<RobotInstructions> _convertDirectionsToRobotInstructions() {
     if (mappedDirectionsToCoordinates.isEmpty) return Queue();
-    var dirsCopy = mappedDirectionsToCoordinates;
+    final dirsCopy = Queue.from(mappedDirectionsToCoordinates);
     Queue<RobotInstructions> robotInstructions = Queue();
     var prevDirection = dirsCopy.removeFirst().directions;
 
@@ -114,6 +115,48 @@ class NormalizedPathDirections {
           prevDirection, prevDirection = dirsCopy.removeFirst().directions));
     }
     return robotInstructions;
+  }
+
+  ///unused
+  //TODO: fix; does not work
+  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates() {
+    final mapDirToCoo = mappedDirectionsToCoordinates;
+    var currMap = mapDirToCoo.removeFirst();
+    Queue<MappedDirectionsToCoordinates> patchedMap = Queue()..add(currMap);
+
+    while (mapDirToCoo.isNotEmpty) {
+      var next = mapDirToCoo.removeFirst();
+
+      for (var coo in currMap.coordinates) {
+        int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
+        const int thresholdPixels = 100;
+        while (_isValidRoute(x, y) && thresholdPixels < counter) {
+          switch (next.directions) {
+            case Directions.left:
+              x--;
+              break;
+            case Directions.right:
+              x++;
+              break;
+            case Directions.up:
+              y--;
+              break;
+            case Directions.down:
+              y++;
+              break;
+          }
+          counter++;
+        }
+
+        if (counter >= thresholdPixels) {
+          patchedMap.add(currMap);
+        } else {
+          continue;
+        }
+      }
+      currMap = next;
+    }
+    return patchedMap;
   }
 
   RobotInstructions _calculateRobotInstructionBasedOnPreviousDirection(

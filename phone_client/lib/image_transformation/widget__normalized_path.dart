@@ -23,14 +23,12 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
             style: const TextStyle(fontSize: 12),
           ),
         ),
-        /*Flexible(
+        Flexible(
           child: Text(
-            widget.normDirections
-                .convertDirectionsToRobotInstructions()
-                .toString(),
+            widget.normDirections.robotInstructions.toString(),
             style: const TextStyle(fontSize: 12),
           ),
-        )*/
+        ),
       ],
     );
   }
