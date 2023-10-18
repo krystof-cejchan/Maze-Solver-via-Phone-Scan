@@ -1,4 +1,4 @@
-import 'package:phone_client/canvas/custom_canvas.dart';
+import 'package:phone_client/canvas/custom_canvas.dart' show CrossPainter;
 
 class Node extends Coordinate {
   int x, y;
@@ -34,10 +34,35 @@ class Coordinate {
   Coordinate(this.xCoordinate, this.yCoordinate);
 }
 
-/// enum values representing a direction the robot or anything going from the start to the end has from the point of view of a 2d image/array
-enum Directions { left, right, up, down }
+class MappedDirectionsToCoordinates {
+  final Directions directions;
+  final List<Coordinate> coordinates;
+  MappedDirectionsToCoordinates(this.directions, this.coordinates);
 
-enum Turns {
+  @override
+  String toString() {
+    return "$directions → {$coordinates}";
+  }
+}
+
+/// enum values representing a direction the robot or anything going from the start to the end has from the point of view of a 2d image/array
+enum Directions {
+  left(true),
+  right(true),
+  up(false),
+  down(false);
+
+  final bool horizontal;
+  const Directions(this.horizontal);
+  RobotInstructions directionsToRobotInstruction() =>
+      RobotInstructions.values.firstWhere((element) => element.name == name);
+}
+
+/// [RobotInstructions] enum represents commands that the robot will follow
+enum RobotInstructions {
   left,
   right,
+  pass;
 }
+
+class WrongFollowupDirectionException implements Exception {}

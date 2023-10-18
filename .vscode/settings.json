@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "cmake.sourceDirectory": "C:/Users/vecer/Desktop/Maze Solver via Phone Scan/Maze-Solver-via-Phone-Scan/phone_client/linux"
 }
