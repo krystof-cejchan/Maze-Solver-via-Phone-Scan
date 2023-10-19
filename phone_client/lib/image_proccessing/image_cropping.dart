@@ -35,9 +35,11 @@ class _ImageCroppingState extends State<ImageCropping>
         child: Crop(
           controller: _cropController,
           image: widget.image.bytes,
-          onCropped: (croppedData) => setState(() {
-            _croppedData = croppedData;
-          }),
+          onCropped: (croppedData) => setState(
+            () {
+              _croppedData = croppedData;
+            },
+          ),
           initialAreaBuilder: (rect) => Rect.fromLTRB(
               rect.left + 54, rect.top + 62, rect.right - 54, rect.bottom - 62),
           cornerDotBuilder: (size, edgeAlignment) =>
@@ -61,13 +63,14 @@ class _ImageCroppingState extends State<ImageCropping>
     Navigator.push(
       context,
       MaterialPageRoute(
-          //uncomment when cropping works
-          //builder: (context) => ImageConversion(custom.Image(_croppedData))),
-          builder: (context) => ImageConversion(
-                widget.image,
-                widget.wallColour,
-                widget.routeColour,
-              )),
+        //uncomment when cropping works
+        //builder: (context) => ImageConversion(custom.Image(_croppedData))),
+        builder: (context) => ImageConversion(
+          widget.image,
+          widget.wallColour,
+          widget.routeColour,
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,5 @@
-import 'dart:typed_data';
-import 'package:image/image.dart' as img;
+import 'dart:typed_data' show Uint8List;
+import 'package:image/image.dart' as img show Image;
 import 'package:phone_client/helpers/lib_class.dart';
 
 class Image {

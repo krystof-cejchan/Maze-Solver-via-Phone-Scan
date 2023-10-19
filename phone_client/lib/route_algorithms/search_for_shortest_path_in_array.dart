@@ -29,8 +29,9 @@ class PathInMatrix {
 
       closedList[currentNode] = currentNode;
 
+      FOR:
       for (final neighbor in _getNeighbors(grid, currentNode)) {
-        if (closedList.containsKey(neighbor)) continue;
+        if (closedList.containsKey(neighbor)) continue FOR;
 
         final tentativeG = currentNode.g + 1.0; // Cardinal movement cost
 

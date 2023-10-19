@@ -32,6 +32,7 @@ class NormalizedPathDirections {
 
     Directions curr; // dummy for saving current Directions
 
+    FOR_LOOPING_THROUGH_COORDINATES:
     for (int i = 1; i < _pathCoordinates.length; i++) {
       final S = i - 1; // constant for saving starting index of a direction
 
@@ -71,7 +72,7 @@ class NormalizedPathDirections {
         }
         // clear history and continue
         history.clear();
-        continue;
+        continue FOR_LOOPING_THROUGH_COORDINATES;
       }
       // else if the directions are not the same before reacing the threshold; clear the history and start over
       else if (!allEqual) {
@@ -82,12 +83,13 @@ class NormalizedPathDirections {
   }
 
   /// checks whether x and y are not border coordinates and whether the pixel places on these coordinates represents route
-  bool _isValidRoute(int x, int y) {
+  bool _isValidRoute(int x, int y, bool route) {
     return x < _imageMaze.w &&
         x > 0 &&
         y < _imageMaze.h &&
         y > 0 &&
-        Library.pixelColour(_imageMaze.image.getPixel(x, y)) == Colors.white;
+        Library.pixelColour(_imageMaze.image.getPixel(x, y)) ==
+            (route ? Colors.white : Colors.black);
   }
 
   /// calculates Direction a pixel has taken since its previous pixel
@@ -106,7 +108,7 @@ class NormalizedPathDirections {
 
   Queue<RobotInstructions> _convertDirectionsToRobotInstructions() {
     if (mappedDirectionsToCoordinates.isEmpty) return Queue();
-    final dirsCopy = Queue.from(mappedDirectionsToCoordinates);
+    final dirsCopy = _patchMappedDirectionsToCoordinates();
     Queue<RobotInstructions> robotInstructions = Queue();
     var prevDirection = dirsCopy.removeFirst().directions;
 
@@ -117,53 +119,14 @@ class NormalizedPathDirections {
     return robotInstructions;
   }
 
-  ///unused
-  //TODO: fix; does not work
-  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates() {
-    final mapDirToCoo = mappedDirectionsToCoordinates;
-    var currMap = mapDirToCoo.removeFirst();
-    Queue<MappedDirectionsToCoordinates> patchedMap = Queue()..add(currMap);
-
-    while (mapDirToCoo.isNotEmpty) {
-      var next = mapDirToCoo.removeFirst();
-
-      for (var coo in currMap.coordinates) {
-        int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
-        const int thresholdPixels = 100;
-        while (_isValidRoute(x, y) && thresholdPixels < counter) {
-          switch (next.directions) {
-            case Directions.left:
-              x--;
-              break;
-            case Directions.right:
-              x++;
-              break;
-            case Directions.up:
-              y--;
-              break;
-            case Directions.down:
-              y++;
-              break;
-          }
-          counter++;
-        }
-
-        if (counter >= thresholdPixels) {
-          patchedMap.add(currMap);
-        } else {
-          continue;
-        }
-      }
-      currMap = next;
-    }
-    return patchedMap;
-  }
-
   RobotInstructions _calculateRobotInstructionBasedOnPreviousDirection(
       Directions prevDirection, Directions nextDirection) {
-    if (prevDirection.horizontal == nextDirection.horizontal) {
-      throw WrongFollowupDirectionException();
+    if (prevDirection == nextDirection) {
+      return RobotInstructions.pass;
+    } else if (prevDirection.horizontal == nextDirection.horizontal) {
+      throw WrongFollowupDirectionException;
     }
+
     switch (prevDirection) {
       case Directions.down:
         return nextDirection == Directions.right
@@ -183,6 +146,66 @@ class NormalizedPathDirections {
             ? RobotInstructions.left
             : RobotInstructions.right;
     }
+  }
+
+  /// calculates if there is a crossroad that needs to be passed;
+  /// if there is one, then in the robotinstructions a pass will be added among all the other instructions like right and left [RobotInstructions]
+  //TODO: may need to be improved → try adding a check that would check whether the crossroad is close to a turn; if yes, then ignore it perhaps
+  //TODO: furthermore if a crossroad is marked as pass, then do not pass until a black pixel found in the direction → finish it
+  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates(
+      {int thresholdPixels = 20}) {
+    /// [mappedDirectionsToCoordinates] is not empty if this method is called
+    final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
+        mappedDirectionsToCoordinates);
+
+    var curr = mapDirToCoo.removeFirst();
+    Queue<MappedDirectionsToCoordinates> patchedMap = Queue();
+
+    ///looping through {DIrection, List of its Coordinates} object
+    while (mapDirToCoo.isNotEmpty) {
+      final next = mapDirToCoo.removeFirst();
+      patchedMap.add(curr);
+      final cooLength = curr.coordinates.length;
+
+      //if next direction occurs, then we want to search for route; so the variable is set to true
+      bool searchingForRoute = true;
+
+      ///looping though Coordinates of the direction from the while loop
+      for (int i = 0; i < (cooLength - (cooLength / 10)); i += 5) {
+        final coo = curr.coordinates[i];
+        int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
+
+        ///looping through pixels in a direction that the next turn takes; and searches for route or wall depending on [searchingForRoute]
+        while (_isValidRoute(x, y, searchingForRoute) &&
+            thresholdPixels > counter) {
+          switch (next.directions) {
+            case Directions.left:
+              x--;
+              break;
+            case Directions.right:
+              x++;
+              break;
+            case Directions.up:
+              y--;
+              break;
+            case Directions.down:
+              y++;
+              break;
+          }
+          counter++;
+        }
+
+        if (counter >= thresholdPixels) {
+          //crossroad found
+          patchedMap.add(curr);
+          searchingForRoute = !searchingForRoute;
+        } else if (!searchingForRoute) {
+          searchingForRoute = !searchingForRoute;
+        }
+      }
+      curr = next;
+    }
+    return patchedMap;
   }
 
   @override

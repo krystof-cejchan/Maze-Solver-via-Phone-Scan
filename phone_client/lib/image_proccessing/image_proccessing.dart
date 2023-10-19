@@ -15,9 +15,10 @@ class _ImageProccessingState extends State<ImageProccessing> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ColorPickerWidget(
-                image: widget.image,
-              )),
+        builder: (context) => ColorPickerWidget(
+          image: widget.image,
+        ),
+      ),
     );
   }
 
