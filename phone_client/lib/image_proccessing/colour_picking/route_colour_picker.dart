@@ -79,13 +79,11 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     );
   }
 
-  Color _invertColour(Color color) {
-    final r = 255 - color.red;
-    final g = 255 - color.green;
-    final b = 255 - color.blue;
-
-    return Color.fromARGB((color.opacity * 255).round(), r, g, b);
-  }
+  Color _invertColour(Color color) => Color.fromARGB(
+      (color.opacity * 255).round(),
+      255 - color.red,
+      255 - color.green,
+      255 - color.blue);
 
   void searchPixel(Offset globalPosition) {
     if (_image.isNotValid()) {
@@ -136,10 +134,11 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => wall.ColorPickerWidget(
-                image: _image,
-                routeColour: pickedRouteColour,
-              )),
+        builder: (context) => wall.ColorPickerWidget(
+          image: _image,
+          routeColour: pickedRouteColour,
+        ),
+      ),
     );
   }
 }
