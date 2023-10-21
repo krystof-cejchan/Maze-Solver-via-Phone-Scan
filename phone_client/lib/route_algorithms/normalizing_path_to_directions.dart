@@ -15,15 +15,20 @@ class NormalizedPathDirections {
   final custom.Image _imageMaze;
   late final Queue<MappedDirectionsToCoordinates> mappedDirectionsToCoordinates;
   late final Queue<RobotInstructions> robotInstructions;
+
   NormalizedPathDirections(this._pathCoordinates, this._imageMaze) {
     mappedDirectionsToCoordinates = _normalizedDirections();
     robotInstructions = _convertDirectionsToRobotInstructions();
   }
 
+  final _thresholdPixels = 20;
+  final _threshold = 25;
+  final _percentCoordinatesLength = 15;
+  final _minLengthOfCoordinates = 15;
+
   /// Normalizes a list of directions by removing consecutive identical directions
   /// until a specified threshold is reached.
-  Queue<MappedDirectionsToCoordinates> _normalizedDirections(
-      {int threshold = 25}) {
+  Queue<MappedDirectionsToCoordinates> _normalizedDirections() {
     //history of [Directions] looped through
     final Queue<Directions> history = Queue<Directions>();
 
@@ -32,7 +37,6 @@ class NormalizedPathDirections {
 
     Directions curr; // dummy for saving current Directions
 
-    FOR_LOOPING_THROUGH_COORDINATES:
     for (int i = 1; i < _pathCoordinates.length; i++) {
       final S = i - 1; // constant for saving starting index of a direction
 
@@ -43,14 +47,12 @@ class NormalizedPathDirections {
       );
 
       // a record added to the history and [curr] is assigned the value of [currDir]
-      history.add(
-        curr = currDir,
-      );
+      history.add(curr = currDir);
 
       // checks whether all elements in history are equal to the [curr]
       bool allEqual = history.every((element) => element == curr);
 
-      if (allEqual && history.length >= threshold) {
+      if (allEqual && history.length >= _threshold) {
         /* while:
          increased [i] is lower than the length of [pathCoordinates] and newly calculated direction is equal to [curr]
          then:
@@ -72,7 +74,7 @@ class NormalizedPathDirections {
         }
         // clear history and continue
         history.clear();
-        continue FOR_LOOPING_THROUGH_COORDINATES;
+        continue;
       }
       // else if the directions are not the same before reacing the threshold; clear the history and start over
       else if (!allEqual) {
@@ -113,9 +115,14 @@ class NormalizedPathDirections {
     var prevDirection = dirsCopy.removeFirst().directions;
 
     while (dirsCopy.isNotEmpty) {
-      robotInstructions.add(_calculateRobotInstructionBasedOnPreviousDirection(
-          prevDirection, prevDirection = dirsCopy.removeFirst().directions));
+      robotInstructions.add(
+        _calculateRobotInstructionBasedOnPreviousDirection(
+          prevDirection,
+          prevDirection = dirsCopy.removeFirst().directions,
+        ),
+      );
     }
+
     return robotInstructions;
   }
 
@@ -151,65 +158,75 @@ class NormalizedPathDirections {
   /// calculates if there is a crossroad that needs to be passed;
   /// if there is one, then in the robotinstructions a pass will be added among all the other instructions like right and left [RobotInstructions]
   //TODO: may need to be improved → try adding a check that would check whether the crossroad is close to a turn; if yes, then ignore it perhaps
-  //TODO: furthermore if a crossroad is marked as pass, then do not pass until a black pixel found in the direction → finish it
-  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates(
-      {int thresholdPixels = 20}) {
+  //TODO: furthermore if a crossroad is marked as pass, then do not pass until a black pixel found in the direction → finish it → need to be improved
+  //TODO: does not return the last turn; seems fixed
+  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates() {
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
-        mappedDirectionsToCoordinates);
-
-    var curr = mapDirToCoo.removeFirst();
+      mappedDirectionsToCoordinates,
+    );
+    MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst();
+    MappedDirectionsToCoordinates next;
     Queue<MappedDirectionsToCoordinates> patchedMap = Queue();
 
     ///looping through {DIrection, List of its Coordinates} object
     while (mapDirToCoo.isNotEmpty) {
-      final next = mapDirToCoo.removeFirst();
+      next = mapDirToCoo.removeFirst();
       patchedMap.add(curr);
       final cooLength = curr.coordinates.length;
+      if (cooLength >= _minLengthOfCoordinates) {
+        //if next direction occurs, then we want to search for route; so the variable is set to true
+        bool searchingForRoute = true;
+        final int percentageLength =
+            (cooLength * (_percentCoordinatesLength / 100)).toInt();
 
-      //if next direction occurs, then we want to search for route; so the variable is set to true
-      bool searchingForRoute = true;
+        ///looping though Coordinates of the direction from the while loop; only if the coordinate length is not too short
+        for (int i = percentageLength;
+            i < cooLength - percentageLength;
+            i += 1) {
+          final coo = curr.coordinates[i];
+          int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
 
-      ///looping though Coordinates of the direction from the while loop
-      for (int i = 0; i < (cooLength - (cooLength / 10)); i += 5) {
-        final coo = curr.coordinates[i];
-        int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
-
-        ///looping through pixels in a direction that the next turn takes; and searches for route or wall depending on [searchingForRoute]
-        while (_isValidRoute(x, y, searchingForRoute) &&
-            thresholdPixels > counter) {
-          switch (next.directions) {
-            case Directions.left:
-              x--;
-              break;
-            case Directions.right:
-              x++;
-              break;
-            case Directions.up:
-              y--;
-              break;
-            case Directions.down:
-              y++;
-              break;
+          ///looping through pixels in a direction that the next turn takes; and searches for route or wall depending on [searchingForRoute]
+          while (_isValidRoute(x, y, searchingForRoute) &&
+              _thresholdPixels > counter) {
+            switch (next.directions) {
+              case Directions.left:
+                x--;
+                break;
+              case Directions.right:
+                x++;
+                break;
+              case Directions.up:
+                y--;
+                break;
+              case Directions.down:
+                y++;
+                break;
+            }
+            counter++;
           }
-          counter++;
-        }
 
-        if (counter >= thresholdPixels) {
-          //crossroad found
-          patchedMap.add(curr);
-          searchingForRoute = !searchingForRoute;
-        } else if (!searchingForRoute) {
-          searchingForRoute = !searchingForRoute;
+          if (counter >= _thresholdPixels) {
+            //crossroad found
+            patchedMap.add(curr);
+            searchingForRoute = !searchingForRoute;
+          } else if (!searchingForRoute) {
+            searchingForRoute = !searchingForRoute;
+          }
         }
       }
       curr = next;
     }
-    return patchedMap;
+    if (patchedMap.length > 1 && patchedMap.last != curr) {
+      return patchedMap..add(curr);
+    } else {
+      return patchedMap;
+    }
   }
 
-  @override
+  /*@override
   String toString() {
     return mappedDirectionsToCoordinates.toString();
-  }
+  }*/
 }

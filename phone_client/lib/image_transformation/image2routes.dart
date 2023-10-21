@@ -238,6 +238,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
     return Offset(px, py);
   }
 
+//TODO: add a loading screen
   void _saveAndMoveOn() {
     final pixels = widget.customImage.image;
 
@@ -272,7 +273,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
       imageCopy.setPixel(
         pieceOfPath.xCoordinate,
         pieceOfPath.yCoordinate,
-        img.ColorInt8.rgb(0, 255, 0),
+        img.ColorInt8.rgb(50, 255, 0),
       );
     }
 
