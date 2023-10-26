@@ -185,9 +185,10 @@ class NormalizedPathDirections {
           cooLength,
           _percentCoordinatesLength,
         ).round();
+        Maze searchingFor = Maze.route;
 
         ///looping though Coordinates of the direction from the while loop; only if the coordinate length is not too short
-       for (int i = percentageLength;
+        for (int i = percentageLength;
             i < cooLength - percentageLength;
             i += 1) {
           final coo = curr.coordinates[i];
@@ -197,8 +198,8 @@ class NormalizedPathDirections {
           //TODO: tady se radši koukni na to hledání těch černých pixelů **
 
           //** došlo k přidání Maze a funkcionalitě s tím spojené
-          while (_shouldCountinue(x,y,searchingFor, _thresholdPixels, counter);
-              _isValidPixel(x, y, searchingFor) && _thresholdPixels > counter) {
+          while (
+              _shouldCountinue(x, y, searchingFor, _thresholdPixels, counter)) {
             switch (next.directions) {
               case Directions.left:
                 x--;
@@ -236,8 +237,10 @@ class NormalizedPathDirections {
     }
   }
 
-  bool _shouldCountinue(int x,int y, Maze seachingFor,{ int? threshold}, int counter)=>
-  _isValidPixel(x,y,searchingFor);//mělo by  urcit zda se má while pokračovat podle toho zda je pixel validní a podle toho co se vůbec hledá
+  bool _shouldCountinue(
+          int x, int y, Maze searchingForMaze, int threshold, int counter) =>
+      _isValidPixel(x, y,
+          searchingForMaze); //mělo by  urcit zda se má while pokračovat podle toho zda je pixel validní a podle toho co se vůbec hledá
 
   num percentageFrom(num originalValue, num percentage) {
     return originalValue * (percentage / 100);
