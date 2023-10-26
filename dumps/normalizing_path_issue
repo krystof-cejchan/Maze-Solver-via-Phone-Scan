@@ -1,0 +1,12 @@
+ ____________________________________________________________
+
+ Pass a crossroad issue:
+ 
+ 1. while se dělá dokud není prázdná fronta se směry a jejich koordinace
+ 2. pokračuje se pouze pokud koordinace(velikost pole) je větší než 15
+ 3. for cyklus projde koordinace mezi 15% až do 85% velikosti koordinací(velikost pole) -- 15%-85% aby se nesppletl s normální zatáčkou
+ 
+ 4. while se dělá dokud je pixel z koordinací validní, tzn. že je v rozmezí obrázku a že má barvu odpovídající cestě (bílou), a dokud se nenaplní threshold (pokud se naplní, tak už není třeba procházet dále koordinace, protože už je ověřeno, že se našla cesta/zeď)
+
+ 4b. pokud je threshold naplněn, tak se přidá do fronty současný směr a jeho koordinace; zároveň se začne hledat pro opačný pixel
+ 4c.

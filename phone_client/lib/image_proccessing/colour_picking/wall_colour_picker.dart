@@ -107,8 +107,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     py /= widgetScale;
 
     try {
-      img.Pixel pixel = _image.image.getPixel(px.toInt(), py.toInt());
-      Color colour = Library.pixelColour(pixel);
+      Color colour = _image.getImagePixelColour(px.round(), py.round());
       _stateController.add(colour);
       pickedWallRoute = colour;
     } on RangeError {

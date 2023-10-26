@@ -238,15 +238,15 @@ class _DestinationPickerState extends State<_DestinationPicker> {
     return Offset(px, py);
   }
 
-//TODO: add a loading screen
+  //TODO: add a loading screen
   void _saveAndMoveOn() {
-    final pixels = widget.customImage.image;
+    final pixels = widget.customImage;
 
     final List<List<int>> grid = List.empty(growable: true);
-    for (int i = 0; i < pixels.width; i++) {
-      List<int> col = List.filled(pixels.height, 0);
-      for (int j = 0; j < pixels.height; j++) {
-        if (Library.pixelColour(pixels.getPixel(i, j)) == Colors.black) {
+    for (int i = 0; i < pixels.w; i++) {
+      List<int> col = List.filled(pixels.h, 0);
+      for (int j = 0; j < pixels.h; j++) {
+        if (pixels.isColourEqualToPixelColour(i, j, Colors.black)) {
           col[j] = 1;
         }
       }

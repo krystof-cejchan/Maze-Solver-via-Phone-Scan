@@ -1,4 +1,5 @@
 import 'dart:typed_data' show Uint8List;
+import 'dart:ui';
 import 'package:image/image.dart' as img show Image;
 import 'package:phone_client/helpers/lib_class.dart';
 
@@ -16,5 +17,13 @@ class Image {
 
   bool isNotValid() {
     return !isValid();
+  }
+
+  Color getImagePixelColour(int x, int y) {
+    return Library.pixelColour(image.getPixel(x, y));
+  }
+
+  bool isColourEqualToPixelColour(int x, int y, Color color) {
+    return getImagePixelColour(x, y) == color;
   }
 }

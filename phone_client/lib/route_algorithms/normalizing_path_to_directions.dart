@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart' show Colors;
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/helpers/lib_class.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
 
 import 'classes,enums,exceptions_for_route_algorithm/coordinate.dart';
 import 'classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
@@ -84,14 +85,19 @@ class NormalizedPathDirections {
     return mapDirToCoo;
   }
 
-  /// checks whether x and y are not border coordinates and whether the pixel places on these coordinates represents route
-  bool _isValidRoute(int x, int y, bool route) {
-    return x < _imageMaze.w &&
-        x > 0 &&
-        y < _imageMaze.h &&
-        y > 0 &&
-        Library.pixelColour(_imageMaze.image.getPixel(x, y)) ==
-            (route ? Colors.white : Colors.black);
+  /// checks whether x and y are not border coordinates and whether the pixel places on these
+  /// coordinates represents the route or wall based on [mazeRepresentative.color]
+  bool _isValidPixel(int x, int y, Maze mazeRepresentative) {
+    return (/*x < _imageMaze.w &&
+            x > 0 &&
+            y < _imageMaze.h &&
+            y > 0 &&*/
+            _imageMaze.isColourEqualToPixelColour(
+          x,
+          y,
+          mazeRepresentative.color,
+        )) ==
+        (mazeRepresentative == Maze.route);
   }
 
   /// calculates Direction a pixel has taken since its previous pixel
@@ -165,31 +171,34 @@ class NormalizedPathDirections {
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
       mappedDirectionsToCoordinates,
     );
-    MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst();
-    MappedDirectionsToCoordinates next;
+    MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst(), next;
     Queue<MappedDirectionsToCoordinates> patchedMap = Queue();
 
-    ///looping through {DIrection, List of its Coordinates} object
+    ///looping through {Direction, List of its Coordinates} object
     while (mapDirToCoo.isNotEmpty) {
       next = mapDirToCoo.removeFirst();
       patchedMap.add(curr);
       final cooLength = curr.coordinates.length;
       if (cooLength >= _minLengthOfCoordinates) {
         //if next direction occurs, then we want to search for route; so the variable is set to true
-        bool searchingForRoute = true;
-        final int percentageLength =
-            (cooLength * (_percentCoordinatesLength / 100)).toInt();
+        final int percentageLength = percentageFrom(
+          cooLength,
+          _percentCoordinatesLength,
+        ).round();
 
         ///looping though Coordinates of the direction from the while loop; only if the coordinate length is not too short
-        for (int i = percentageLength;
+       for (int i = percentageLength;
             i < cooLength - percentageLength;
             i += 1) {
           final coo = curr.coordinates[i];
           int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
 
           ///looping through pixels in a direction that the next turn takes; and searches for route or wall depending on [searchingForRoute]
-          while (_isValidRoute(x, y, searchingForRoute) &&
-              _thresholdPixels > counter) {
+          //TODO: tady se radši koukni na to hledání těch černých pixelů **
+
+          //** došlo k přidání Maze a funkcionalitě s tím spojené
+          while (_shouldCountinue(x,y,searchingFor, _thresholdPixels, counter);
+              _isValidPixel(x, y, searchingFor) && _thresholdPixels > counter) {
             switch (next.directions) {
               case Directions.left:
                 x--;
@@ -210,9 +219,11 @@ class NormalizedPathDirections {
           if (counter >= _thresholdPixels) {
             //crossroad found
             patchedMap.add(curr);
-            searchingForRoute = !searchingForRoute;
-          } else if (!searchingForRoute) {
-            searchingForRoute = !searchingForRoute;
+            searchingFor.negate();
+          } else if (searchingFor == Maze.wall) {
+            //patchedMap.add(curr);
+            searchingFor = Maze.route;
+            continue;
           }
         }
       }
@@ -223,6 +234,13 @@ class NormalizedPathDirections {
     } else {
       return patchedMap;
     }
+  }
+
+  bool _shouldCountinue(int x,int y, Maze seachingFor,{ int? threshold}, int counter)=>
+  _isValidPixel(x,y,searchingFor);//mělo by  urcit zda se má while pokračovat podle toho zda je pixel validní a podle toho co se vůbec hledá
+
+  num percentageFrom(num originalValue, num percentage) {
+    return originalValue * (percentage / 100);
   }
 
   /*@override
