@@ -1,6 +1,6 @@
 import 'dart:typed_data' show Uint8List;
 import 'dart:ui';
-import 'package:image/image.dart' as img show Image;
+import 'package:image/image.dart' as img show Image, decodeImage;
 import 'package:phone_client/helpers/lib_class.dart';
 
 class Image {
@@ -10,6 +10,7 @@ class Image {
   late final int length = w * h;
 
   Image(this.image) : bytes = Library.imageAsBytes(image);
+  Image.fromBytes(this.bytes) : image = img.decodeImage(bytes)!;
 
   bool isValid() {
     return image.isValid;
