@@ -27,4 +27,6 @@ class Image {
   bool isColourEqualToPixelColour(int x, int y, Color color) {
     return getImagePixelColour(x, y) == color;
   }
+
+  bool isXYWithinBounds(int x, int y) => x < w && x > 0 && y < h && y > 0;
 }

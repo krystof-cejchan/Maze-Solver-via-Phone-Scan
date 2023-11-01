@@ -1,10 +1,10 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart' show Colors;
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
 
+import '../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import 'classes,enums,exceptions_for_route_algorithm/coordinate.dart';
 import 'classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
 import 'classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
@@ -19,7 +19,7 @@ class NormalizedPathDirections {
 
   NormalizedPathDirections(this._pathCoordinates, this._imageMaze) {
     mappedDirectionsToCoordinates = _normalizedDirections();
-    robotInstructions = _convertDirectionsToRobotInstructions();
+    robotInstructions = _patchMappedDirectionsToCoordinates();
   }
 
   final _thresholdPixels = 20;
@@ -54,10 +54,6 @@ class NormalizedPathDirections {
       bool allEqual = history.every((element) => element == curr);
 
       if (allEqual && history.length >= _threshold) {
-        /* while:
-         increased [i] is lower than the length of [pathCoordinates] and newly calculated direction is equal to [curr]
-         then:
-         continue*/
         while (++i < _pathCoordinates.length &&
             (currDir = _directionFromPreviousCoordinates(
                   _pathCoordinates[i],
@@ -85,21 +81,6 @@ class NormalizedPathDirections {
     return mapDirToCoo;
   }
 
-  /// checks whether x and y are not border coordinates and whether the pixel places on these
-  /// coordinates represents the route or wall based on [mazeRepresentative.color]
-  bool _isValidPixel(int x, int y, Maze mazeRepresentative) {
-    return (/*x < _imageMaze.w &&
-            x > 0 &&
-            y < _imageMaze.h &&
-            y > 0 &&*/
-            _imageMaze.isColourEqualToPixelColour(
-          x,
-          y,
-          mazeRepresentative.color,
-        )) ==
-        (mazeRepresentative == Maze.route);
-  }
-
   /// calculates Direction a pixel has taken since its previous pixel
   Directions _directionFromPreviousCoordinates(
       Coordinate curr, Coordinate prev) {
@@ -114,7 +95,7 @@ class NormalizedPathDirections {
     }
   }
 
-  Queue<RobotInstructions> _convertDirectionsToRobotInstructions() {
+  /*Queue<RobotInstructions> _convertDirectionsToRobotInstructions() {
     if (mappedDirectionsToCoordinates.isEmpty) return Queue();
     final dirsCopy = _patchMappedDirectionsToCoordinates();
     Queue<RobotInstructions> robotInstructions = Queue();
@@ -130,7 +111,7 @@ class NormalizedPathDirections {
     }
 
     return robotInstructions;
-  }
+  }*/
 
   RobotInstructions _calculateRobotInstructionBasedOnPreviousDirection(
       Directions prevDirection, Directions nextDirection) {
@@ -163,22 +144,18 @@ class NormalizedPathDirections {
 
   /// calculates if there is a crossroad that needs to be passed;
   /// if there is one, then in the robotinstructions a pass will be added among all the other instructions like right and left [RobotInstructions]
-  //TODO: may need to be improved → try adding a check that would check whether the crossroad is close to a turn; if yes, then ignore it perhaps
-  //TODO: furthermore if a crossroad is marked as pass, then do not pass until a black pixel found in the direction → finish it → need to be improved
-  //TODO: does not return the last turn; seems fixed
-  Queue<MappedDirectionsToCoordinates> _patchMappedDirectionsToCoordinates() {
+  Queue<RobotInstructions> _patchMappedDirectionsToCoordinates() {
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
       mappedDirectionsToCoordinates,
     );
     MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst(), next;
-    Queue<MappedDirectionsToCoordinates> patchedMap = Queue();
+    Queue<RobotInstructions> robotInstructions = Queue();
 
     ///looping through {Direction, List of its Coordinates} object
     while (mapDirToCoo.isNotEmpty) {
       next = mapDirToCoo.removeFirst();
-      patchedMap.add(curr);
-      final cooLength = curr.coordinates.length;
+      final int cooLength = curr.coordinates.length;
       if (cooLength >= _minLengthOfCoordinates) {
         //if next direction occurs, then we want to search for route; so the variable is set to true
         final int percentageLength = percentageFrom(
@@ -188,18 +165,17 @@ class NormalizedPathDirections {
         Maze searchingFor = Maze.route;
 
         ///looping though Coordinates of the direction from the while loop; only if the coordinate length is not too short
+        COORDINATES_FOR_LOOP:
         for (int i = percentageLength;
             i < cooLength - percentageLength;
             i += 1) {
           final coo = curr.coordinates[i];
           int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
 
-          ///looping through pixels in a direction that the next turn takes; and searches for route or wall depending on [searchingForRoute]
-          //TODO: tady se radši koukni na to hledání těch černých pixelů **
-
-          //** došlo k přidání Maze a funkcionalitě s tím spojené
-          while (
-              _shouldCountinue(x, y, searchingFor, _thresholdPixels, counter)) {
+          PxResult pxFound;
+          while ((pxFound = _shouldCountinue(x, y, searchingFor, counter))
+                  .shouldContinue ==
+              true) {
             switch (next.directions) {
               case Directions.left:
                 x--;
@@ -216,35 +192,48 @@ class NormalizedPathDirections {
             }
             counter++;
           }
-
-          if (counter >= _thresholdPixels) {
-            //crossroad found
-            patchedMap.add(curr);
-            searchingFor.negate();
-          } else if (searchingFor == Maze.wall) {
-            //patchedMap.add(curr);
-            searchingFor = Maze.route;
-            continue;
+          print(pxFound);
+          switch (pxFound) {
+            case PxResult.foundCrossroad:
+              robotInstructions.add(RobotInstructions.pass);
+              searchingFor = Maze.wall;
+              break;
+            case PxResult.foundWall:
+              searchingFor = Maze.route;
+              break;
+            case PxResult.notYetWall:
+              searchingFor = Maze.wall;
+              break;
+            default:
+              continue COORDINATES_FOR_LOOP;
           }
         }
       }
+      robotInstructions.add(_calculateRobotInstructionBasedOnPreviousDirection(
+          curr.directions, next.directions));
       curr = next;
     }
-    if (patchedMap.length > 1 && patchedMap.last != curr) {
-      return patchedMap..add(curr);
-    } else {
-      return patchedMap;
+
+    return robotInstructions;
+  }
+
+  PxResult _shouldCountinue(int x, int y, Maze searchingForMaze, int counter) {
+    if (searchingForMaze == Maze.wall) {
+      return _imageMaze.isColourEqualToPixelColour(x, y, C.wall)
+          ? PxResult.foundWall
+          : PxResult.notYetWall;
     }
+    if (searchingForMaze == Maze.route &&
+        _imageMaze.isColourEqualToPixelColour(x, y, C.route)) {
+      return counter >= _thresholdPixels
+          ? PxResult.foundCrossroad
+          : PxResult.foundRoute;
+    }
+    return PxResult.na;
   }
 
-  bool _shouldCountinue(
-          int x, int y, Maze searchingForMaze, int threshold, int counter) =>
-      _isValidPixel(x, y,
-          searchingForMaze); //mělo by  urcit zda se má while pokračovat podle toho zda je pixel validní a podle toho co se vůbec hledá
-
-  num percentageFrom(num originalValue, num percentage) {
-    return originalValue * (percentage / 100);
-  }
+  num percentageFrom(num originalValue, num percentage) =>
+      originalValue * (percentage / 100);
 
   /*@override
   String toString() {

@@ -9,6 +9,7 @@ import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route
 import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
+import '../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
@@ -246,7 +247,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
     for (int i = 0; i < pixels.w; i++) {
       List<int> col = List.filled(pixels.h, 0);
       for (int j = 0; j < pixels.h; j++) {
-        if (pixels.isColourEqualToPixelColour(i, j, Colors.black)) {
+        if (pixels.isColourEqualToPixelColour(i, j, C.wall)) {
           col[j] = 1;
         }
       }

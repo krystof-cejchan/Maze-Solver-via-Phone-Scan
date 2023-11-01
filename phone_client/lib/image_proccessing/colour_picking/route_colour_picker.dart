@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/lib_class.dart';
+import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import '../../helpers/custom_image_class.dart' as custom;
 import './wall_colour_picker.dart' as wall;
 
@@ -20,7 +21,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   GlobalKey paintKey = GlobalKey();
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
-  Color pickedRouteColour = Colors.black;
+  Color pickedRouteColour = C.wall;
 
   late GlobalKey currentKey;
 

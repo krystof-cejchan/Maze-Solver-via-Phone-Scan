@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/image_proccessing/image_cropping.dart';
 import '../../helpers/custom_image_class.dart' as custom;
+import 'route_and_wall_global_constants.dart';
 
 class ColorPickerWidget extends StatefulWidget {
   const ColorPickerWidget(
@@ -24,7 +25,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
 
-  Color pickedWallRoute = Colors.white;
+  Color pickedWallRoute = C.route;
 
   final StreamController<Color> _stateController = StreamController<Color>();
   final Color initColour = const Color.fromARGB(255, 238, 238, 238);
