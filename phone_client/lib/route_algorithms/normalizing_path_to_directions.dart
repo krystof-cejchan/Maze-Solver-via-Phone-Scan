@@ -192,10 +192,8 @@ class NormalizedPathDirections {
               continue COORDINATES_FOR_LOOP;
           }
         }
-        robotInstructions.add(_calcRobotIntruct(
-          curr.directions,
-          next.directions,
-        ));
+        robotInstructions
+            .add(_calcRobotIntruct(curr.directions, next.directions));
       }
       curr = next;
     }
