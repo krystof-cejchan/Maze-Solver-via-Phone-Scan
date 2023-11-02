@@ -5,9 +5,11 @@ import 'package:phone_client/camera.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
-  runApp(MyApp(
-    camera: cameras.first,
-  ));
+  runApp(
+    MyApp(
+      camera: cameras.first,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,14 +20,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Maze Solver — Phone client',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 231, 174, 5)),
-          useMaterial3: true,
-        ),
-        home: CameraScreen(
-          camera: camera,
-        ));
+      title: 'Maze Solver — Phone client',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 231, 174, 5)),
+        useMaterial3: true,
+      ),
+      home: CameraScreen(
+        camera: camera,
+      ),
+    );
   }
 }

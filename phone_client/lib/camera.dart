@@ -47,6 +47,7 @@ class CameraScreenState extends State<CameraScreen> {
       custom.Image customImage =
           custom.Image(img.decodeImage(File(xFile.path).readAsBytesSync())!);
 
+      File(xFile.path).deleteSync();
       if (customImage.isValid()) {
         _openImageInNewRoute(customImage);
       }

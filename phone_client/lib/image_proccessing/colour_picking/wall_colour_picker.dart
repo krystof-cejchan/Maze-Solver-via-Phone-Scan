@@ -6,6 +6,7 @@ import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/image_proccessing/image_cropping.dart';
 import '../../helpers/custom_image_class.dart' as custom;
+import 'route_and_wall_global_constants.dart';
 
 class ColorPickerWidget extends StatefulWidget {
   const ColorPickerWidget(
@@ -24,7 +25,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
 
-  Color pickedWallRoute = Colors.white;
+  Color pickedWallRoute = C.route;
 
   final StreamController<Color> _stateController = StreamController<Color>();
   final Color initColour = const Color.fromARGB(255, 238, 238, 238);
@@ -81,13 +82,12 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     );
   }
 
-  Color _invertColour(Color color) {
-    final r = 255 - color.red;
-    final g = 255 - color.green;
-    final b = 255 - color.blue;
-
-    return Color.fromARGB((color.opacity * 255).round(), r, g, b);
-  }
+  Color _invertColour(Color color) => Color.fromARGB(
+        (color.opacity * 255).round(),
+        255 - color.red,
+        255 - color.green,
+        255 - color.blue,
+      );
 
   void searchPixel(Offset globalPosition) {
     if (_image.isNotValid()) {
@@ -108,8 +108,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     py /= widgetScale;
 
     try {
-      img.Pixel pixel = _image.image.getPixel(px.toInt(), py.toInt());
-      Color colour = Library.pixelColour(pixel);
+      Color colour = _image.getImagePixelColour(px.round(), py.round());
       _stateController.add(colour);
       pickedWallRoute = colour;
     } on RangeError {
@@ -138,11 +137,12 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => ImageCropping(
-                image: _image,
-                routeColour: widget.routeColour,
-                wallColour: pickedWallRoute,
-              )),
+        builder: (context) => ImageCropping(
+          image: _image,
+          routeColour: widget.routeColour,
+          wallColour: pickedWallRoute,
+        ),
+      ),
     );
   }
 }

@@ -1,5 +1,6 @@
-import 'dart:typed_data';
-import 'package:image/image.dart' as img;
+import 'dart:typed_data' show Uint8List;
+import 'dart:ui';
+import 'package:image/image.dart' as img show Image, decodeImage;
 import 'package:phone_client/helpers/lib_class.dart';
 
 class Image {
@@ -9,6 +10,7 @@ class Image {
   late final int length = w * h;
 
   Image(this.image) : bytes = Library.imageAsBytes(image);
+  Image.fromBytes(this.bytes) : image = img.decodeImage(bytes)!;
 
   bool isValid() {
     return image.isValid;
@@ -17,4 +19,14 @@ class Image {
   bool isNotValid() {
     return !isValid();
   }
+
+  Color getImagePixelColour(int x, int y) {
+    return Library.pixelColour(image.getPixel(x, y));
+  }
+
+  bool isColourEqualToPixelColour(int x, int y, Color color) {
+    return getImagePixelColour(x, y) == color;
+  }
+
+  bool isXYWithinBounds(int x, int y) => x < w && x > 0 && y < h && y > 0;
 }

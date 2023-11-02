@@ -9,6 +9,7 @@ import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route
 import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
+import '../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
@@ -238,14 +239,15 @@ class _DestinationPickerState extends State<_DestinationPicker> {
     return Offset(px, py);
   }
 
+  //TODO: add a loading screen
   void _saveAndMoveOn() {
-    final pixels = widget.customImage.image;
+    final pixels = widget.customImage;
 
     final List<List<int>> grid = List.empty(growable: true);
-    for (int i = 0; i < pixels.width; i++) {
-      List<int> col = List.filled(pixels.height, 0);
-      for (int j = 0; j < pixels.height; j++) {
-        if (Library.pixelColour(pixels.getPixel(i, j)) == Colors.black) {
+    for (int i = 0; i < pixels.w; i++) {
+      List<int> col = List.filled(pixels.h, 0);
+      for (int j = 0; j < pixels.h; j++) {
+        if (pixels.isColourEqualToPixelColour(i, j, C.wall)) {
           col[j] = 1;
         }
       }
@@ -272,7 +274,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
       imageCopy.setPixel(
         pieceOfPath.xCoordinate,
         pieceOfPath.yCoordinate,
-        img.ColorInt8.rgb(0, 255, 0),
+        img.ColorInt8.rgb(50, 255, 0),
       );
     }
 

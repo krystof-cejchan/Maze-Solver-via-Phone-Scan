@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/lib_class.dart';
+import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import '../../helpers/custom_image_class.dart' as custom;
 import './wall_colour_picker.dart' as wall;
 
@@ -20,7 +21,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   GlobalKey paintKey = GlobalKey();
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
-  Color pickedRouteColour = Colors.black;
+  Color pickedRouteColour = C.wall;
 
   late GlobalKey currentKey;
 
@@ -79,13 +80,11 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     );
   }
 
-  Color _invertColour(Color color) {
-    final r = 255 - color.red;
-    final g = 255 - color.green;
-    final b = 255 - color.blue;
-
-    return Color.fromARGB((color.opacity * 255).round(), r, g, b);
-  }
+  Color _invertColour(Color color) => Color.fromARGB(
+      (color.opacity * 255).round(),
+      255 - color.red,
+      255 - color.green,
+      255 - color.blue);
 
   void searchPixel(Offset globalPosition) {
     if (_image.isNotValid()) {
@@ -106,8 +105,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     py /= widgetScale;
 
     try {
-      img.Pixel pixel = _image.image.getPixel(px.toInt(), py.toInt());
-      Color colour = Library.pixelColour(pixel);
+      Color colour = _image.getImagePixelColour(px.round(), py.round());
       _stateController.add(colour);
       pickedRouteColour = colour;
     } on RangeError {
@@ -136,10 +134,11 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => wall.ColorPickerWidget(
-                image: _image,
-                routeColour: pickedRouteColour,
-              )),
+        builder: (context) => wall.ColorPickerWidget(
+          image: _image,
+          routeColour: pickedRouteColour,
+        ),
+      ),
     );
   }
 }
