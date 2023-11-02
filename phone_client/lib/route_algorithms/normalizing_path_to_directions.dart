@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
@@ -13,7 +14,7 @@ import 'classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordi
 
 class NormalizedPathDirections {
   final List<Coordinate> _pathCoordinates;
-  final custom.Image _imageMaze;
+  custom.Image _imageMaze;
   late final Queue<MappedDirectionsToCoordinates> mappedDirectionsToCoordinates;
   late final Queue<RobotInstructions> robotInstructions;
 
@@ -22,10 +23,10 @@ class NormalizedPathDirections {
     robotInstructions = _patchMappedDirectionsToCoordinates();
   }
 
-  final _thresholdPixels = 20;
+  final _thresholdPixels = 15;
   final _threshold = 25;
   final _percentCoordinatesLength = 15;
-  final _minLengthOfCoordinates = 15;
+  final _minLengthOfCoordinates = 10;
   final _timesFoundWallLimit = 10;
 
   /// Normalizes a list of directions by removing consecutive identical directions
@@ -129,6 +130,8 @@ class NormalizedPathDirections {
   /// calculates if there is a crossroad that needs to be passed;
   /// if there is one, then in the robotinstructions a pass will be added among all the other instructions like right and left [RobotInstructions]
   Queue<RobotInstructions> _patchMappedDirectionsToCoordinates() {
+    List<Coordinate> lc = List.empty(growable: true);
+
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
         mappedDirectionsToCoordinates);
@@ -152,7 +155,7 @@ class NormalizedPathDirections {
         COORDINATES_FOR_LOOP:
         for (int i = percentageLength;
             i < cooLength - percentageLength;
-            i += 3) {
+            i += 1) {
           final coo = curr.coordinates[i];
           int x = coo.xCoordinate, y = coo.yCoordinate;
           int counter = 0;
@@ -162,21 +165,21 @@ class NormalizedPathDirections {
               .carryOnLooping) {
             switch (next.directions) {
               case Directions.left:
-                x--;
+                x -= 1;
                 break;
               case Directions.right:
-                x++;
+                x += 1;
                 break;
               case Directions.up:
-                y--;
+                y -= 1;
                 break;
               case Directions.down:
-                y++;
+                y += 1;
                 break;
             }
+            lc.add(Coordinate(x, y));
             counter++;
           }
-          print(pxFound);
           switch (pxFound) {
             case PxResult.foundCrossroad:
               robotInstructions.add(RobotInstructions.pass);
@@ -197,7 +200,11 @@ class NormalizedPathDirections {
       }
       curr = next;
     }
-
+    var cim = _imageMaze.image;
+    for (var c in lc) {
+      cim.setPixelRgb(c.xCoordinate, c.yCoordinate, 255, 0, 0);
+    }
+    _imageMaze = custom.Image(cim);
     return robotInstructions;
   }
 
