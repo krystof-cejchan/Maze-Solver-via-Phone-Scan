@@ -23,7 +23,7 @@ class NormalizedPathDirections {
     robotInstructions = _patchMappedDirectionsToCoordinates();
   }
 
-  final _thresholdPixels = 15;
+  final _thresholdPixels = 20;
   final _threshold = 25;
   final _percentCoordinatesLength = 15;
   final _minLengthOfCoordinates = 10;
@@ -70,6 +70,15 @@ class NormalizedPathDirections {
               List<Coordinate>.from(
                 _pathCoordinates.sublist(S, --i),
               )));
+        } else if (mapDirToCoo.last.directions == curr) {
+          final last = mapDirToCoo.removeLast();
+          mapDirToCoo.add(
+            last
+              ..coordinates = [
+                ...last.coordinates,
+                ..._pathCoordinates.sublist(S, --i),
+              ],
+          );
         }
         // clear history and continue
         history.clear();
@@ -180,6 +189,7 @@ class NormalizedPathDirections {
             lc.add(Coordinate(x, y));
             counter++;
           }
+
           switch (pxFound) {
             case PxResult.foundCrossroad:
               robotInstructions.add(RobotInstructions.pass);
@@ -202,7 +212,7 @@ class NormalizedPathDirections {
     }
     var cim = _imageMaze.image;
     for (var c in lc) {
-      cim.setPixelRgb(c.xCoordinate, c.yCoordinate, 255, 0, 0);
+      cim.setPixelRgb(c.xCoordinate, c.yCoordinate, 255, 166, 0);
     }
     _imageMaze = custom.Image(cim);
     return robotInstructions;
