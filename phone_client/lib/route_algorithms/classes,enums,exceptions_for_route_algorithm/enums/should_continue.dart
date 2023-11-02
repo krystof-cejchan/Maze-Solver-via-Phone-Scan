@@ -3,9 +3,9 @@ enum PxResult {
   notYetWall(true),
   foundCrossroad(false),
   foundRoute(true),
-  mismatch(false),
-  na(null);
+  err(false),
+  foundMismatch(false);
 
-  final bool? shouldContinue;
-  const PxResult(this.shouldContinue);
+  final bool carryOnLooping;
+  const PxResult(this.carryOnLooping);
 }

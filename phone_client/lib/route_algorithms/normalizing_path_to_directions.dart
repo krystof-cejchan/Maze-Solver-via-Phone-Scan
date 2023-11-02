@@ -26,7 +26,7 @@ class NormalizedPathDirections {
   final _threshold = 25;
   final _percentCoordinatesLength = 15;
   final _minLengthOfCoordinates = 15;
-  final _timesFoundWallLimit = 5;
+  final _timesFoundWallLimit = 10;
 
   /// Normalizes a list of directions by removing consecutive identical directions
   /// until a specified threshold is reached.
@@ -96,7 +96,8 @@ class NormalizedPathDirections {
     }
   }
 
-  RobotInstructions _calculateRobotInstructionBasedOnPreviousDirection(
+  /// calculates [RobotInstructions] based on previous and next [Directions]
+  RobotInstructions _calcRobotIntruct(
       Directions prevDirection, Directions nextDirection) {
     if (prevDirection == nextDirection) {
       return RobotInstructions.pass;
@@ -130,8 +131,7 @@ class NormalizedPathDirections {
   Queue<RobotInstructions> _patchMappedDirectionsToCoordinates() {
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
-      mappedDirectionsToCoordinates,
-    );
+        mappedDirectionsToCoordinates);
     MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst(), next;
     Queue<RobotInstructions> robotInstructions = Queue();
 
@@ -145,21 +145,21 @@ class NormalizedPathDirections {
           cooLength,
           _percentCoordinatesLength,
         ).round();
-        Maze searchingFor = Maze.route;
+        Maze mazeTarget = Maze.route;
         int timesFoundWall = 0;
 
         ///looping though Coordinates of the direction from the while loop; only if the coordinate length is not too short
         COORDINATES_FOR_LOOP:
         for (int i = percentageLength;
             i < cooLength - percentageLength;
-            i += 1) {
+            i += 3) {
           final coo = curr.coordinates[i];
-          int x = coo.xCoordinate, y = coo.yCoordinate, counter = 0;
-
+          int x = coo.xCoordinate, y = coo.yCoordinate;
+          int counter = 0;
           PxResult pxFound;
-          while ((pxFound = _shouldCountinue(x, y, searchingFor, counter))
-                  .shouldContinue ==
-              true) {
+          while ((pxFound =
+                  _handlePixelInLoopContext(x, y, mazeTarget, counter))
+              .carryOnLooping) {
             switch (next.directions) {
               case Directions.left:
                 x--;
@@ -180,46 +180,61 @@ class NormalizedPathDirections {
           switch (pxFound) {
             case PxResult.foundCrossroad:
               robotInstructions.add(RobotInstructions.pass);
-              searchingFor = Maze.wall;
+              mazeTarget = Maze.wall;
+              // i += 7;
               break;
             case PxResult.foundWall:
               if (++timesFoundWall < _timesFoundWallLimit) continue;
-              searchingFor = Maze.route;
+              mazeTarget = Maze.route;
               timesFoundWall = 0;
-              break;
-            case PxResult.notYetWall:
-              searchingFor = Maze.wall;
               break;
             default:
               continue COORDINATES_FOR_LOOP;
           }
         }
+        robotInstructions.add(_calcRobotIntruct(
+          curr.directions,
+          next.directions,
+        ));
       }
-      robotInstructions.add(_calculateRobotInstructionBasedOnPreviousDirection(
-          curr.directions, next.directions));
       curr = next;
     }
 
     return robotInstructions;
   }
 
-  PxResult _shouldCountinue(int x, int y, Maze searchingForMaze, int counter) {
-    print("$x\t$y");
-    if (searchingForMaze == Maze.wall) {
-      return _imageMaze.isColourEqualToPixelColour(x, y, C.wall)
-          ? PxResult.foundWall
-          : PxResult.notYetWall;
-    }
+  ///TODO: needs to be consistent and bugproof
+  PxResult _handlePixelInLoopContext(
+    int x,
+    int y,
+    Maze searchingForMaze,
+    int counter,
+  ) {
+    ///pixel colour from x,y coordinates taken from [_imageMaze]
+    var pxColor = _imageMaze.getImagePixelColour(x, y);
+
+    ///has threshold been reached?
+    bool isTresholdReached = counter >= _thresholdPixels;
+
     if (searchingForMaze == Maze.route) {
-      if (_imageMaze.isColourEqualToPixelColour(x, y, C.route)) {
-        return counter >= _thresholdPixels
-            ? PxResult.foundCrossroad
-            : PxResult.foundRoute;
-      } else {
-        return PxResult.mismatch;
+      // we search for route | → white colour is expected
+      if (pxColor == C.wall) {
+        return PxResult
+            .foundMismatch; // black pixel found; stop looking for a crossroad
+      }
+      // if white colour is found and the threshold is reached, we found a crossroad — else we keep on searching
+      return isTresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
+    } else if (searchingForMaze == Maze.wall) {
+      // we search for wall
+      if (pxColor == C.route) {
+        // white pixel was found -- black is expected tho
+        return isTresholdReached ? PxResult.foundMismatch : PxResult.notYetWall;
+      } else if (pxColor == C.wall) {
+        return PxResult.foundWall;
       }
     }
-    return PxResult.na;
+
+    return PxResult.err;
   }
 
   num percentageFrom(num originalValue, num percentage) =>
