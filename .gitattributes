@@ -1,4 +1,0 @@
-* linguist-vendored
-*.ino linguist-vendored=false
-*.dart linguist-vendored=false
-*.cc linguist-vendored=false
