@@ -25,6 +25,38 @@
   }*/
 
 
+PxResult _handlePixelInLoopContext(
+    int x,
+    int y,
+    Maze searchingForMaze,
+    int counter,
+  ) {
+    ///pixel colour from x,y coordinates taken from [_imageMaze]
+    var pxColor = _imageMaze.getImagePixelColour(x, y);
+
+    ///has threshold been reached?
+    bool isTresholdReached = counter >= _thresholdPixels;
+
+    if (searchingForMaze == Maze.route) {
+      // we search for route | → white colour is expected
+      if (pxColor == C.wall) {
+        return PxResult
+            .foundMismatch; // black pixel found; stop looking for a crossroad
+      }
+      // if white colour is found and the threshold is reached, we found a crossroad — else we keep on searching
+      return isTresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
+    } else if (searchingForMaze == Maze.wall) {
+      // we search for wall
+      if (pxColor == C.route) {
+        // white pixel was found -- black is expected tho
+        return isTresholdReached ? PxResult.foundMismatch : PxResult.notYetWall;
+      } else if (pxColor == C.wall) {
+        return PxResult.foundWall;
+      }
+    }
+
+    return PxResult.err;
+  }
 
 
 
