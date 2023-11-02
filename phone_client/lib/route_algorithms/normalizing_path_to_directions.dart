@@ -174,16 +174,16 @@ class NormalizedPathDirections {
               .carryOnLooping) {
             switch (next.directions) {
               case Directions.left:
-                x -= 1;
+                x--;
                 break;
               case Directions.right:
-                x += 1;
+                x++;
                 break;
               case Directions.up:
-                y -= 1;
+                y--;
                 break;
               case Directions.down:
-                y += 1;
+                y++;
                 break;
             }
             lc.add(Coordinate(x, y));
@@ -194,7 +194,6 @@ class NormalizedPathDirections {
             case PxResult.foundCrossroad:
               robotInstructions.add(RobotInstructions.pass);
               mazeTarget = Maze.wall;
-              // i += 7;
               break;
             case PxResult.foundWall:
               if (++timesFoundWall < _timesFoundWallLimit) continue;
@@ -218,32 +217,34 @@ class NormalizedPathDirections {
     return robotInstructions;
   }
 
-  ///TODO: needs to be consistent and bugproof
   PxResult _handlePixelInLoopContext(
     int x,
     int y,
     Maze searchingForMaze,
     int counter,
   ) {
-    ///pixel colour from x,y coordinates taken from [_imageMaze]
+    // Get the pixel color from the (x, y) coordinates of the image maze
     var pxColor = _imageMaze.getImagePixelColour(x, y);
 
-    ///has threshold been reached?
-    bool isTresholdReached = counter >= _thresholdPixels;
+    // Check if the threshold has been reached
+    bool isThresholdReached = counter >= _thresholdPixels;
 
     if (searchingForMaze == Maze.route) {
-      // we search for route | → white colour is expected
+      // We are searching for a route, and we expect white color
       if (pxColor == C.wall) {
         return PxResult
-            .foundMismatch; // black pixel found; stop looking for a crossroad
+            .foundMismatch; // A black pixel was found; stop looking for a crossroad
       }
-      // if white colour is found and the threshold is reached, we found a crossroad — else we keep on searching
-      return isTresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
+
+      // If a white color is found and the threshold is reached, we found a crossroad; otherwise, we keep on searching
+      return isThresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
     } else if (searchingForMaze == Maze.wall) {
-      // we search for wall
+      // We are searching for a wall
       if (pxColor == C.route) {
-        // white pixel was found -- black is expected tho
-        return isTresholdReached ? PxResult.foundMismatch : PxResult.notYetWall;
+        // A white pixel was found, but we expect black
+        return isThresholdReached
+            ? PxResult.foundMismatch
+            : PxResult.notYetWall;
       } else if (pxColor == C.wall) {
         return PxResult.foundWall;
       }
