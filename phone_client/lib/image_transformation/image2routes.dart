@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
+import 'package:phone_client/image_transformation/loading_screen_shown_when_calculating_path.dart';
 import 'package:phone_client/image_transformation/widget__normalized_path.dart';
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
@@ -241,48 +242,18 @@ class _DestinationPickerState extends State<_DestinationPicker> {
 
   //TODO: add a loading screen
   void _saveAndMoveOn() {
-    final pixels = widget.customImage;
-
-    final List<List<int>> grid = List.empty(growable: true);
-    for (int i = 0; i < pixels.w; i++) {
-      List<int> col = List.filled(pixels.h, 0);
-      for (int j = 0; j < pixels.h; j++) {
-        if (pixels.isColourEqualToPixelColour(i, j, C.wall)) {
-          col[j] = 1;
-        }
-      }
-      grid.add(col);
-    }
-
-    final List<Coordinate> shortestPath = PathInMatrix(
-      grid,
-      Coordinates(
-        widget.start.dx.toInt(),
-        widget.start.dy.toInt(),
-        crossCenter.dx.toInt(),
-        crossCenter.dy.toInt(),
-      ),
-    ).foundPath;
-
-    final normalizedDirections =
-        NormalizedPathDirections(shortestPath, widget.customImage);
-
-    img.Image imageCopy = widget.customImage.image;
-
-    for (int i = 0; i < shortestPath.length; i++) {
-      final pieceOfPath = shortestPath[i];
-      imageCopy.setPixel(
-        pieceOfPath.xCoordinate,
-        pieceOfPath.yCoordinate,
-        img.ColorInt8.rgb(50, 255, 0),
-      );
-    }
-
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => NormalizedPathWidget(normalizedDirections,
-            pathImage: custom.Image(imageCopy)),
+        builder: (context) => LoadingScreenForPath(
+          widget.customImage,
+          Coordinates(
+            widget.start.dx.toInt(),
+            widget.start.dy.toInt(),
+            crossCenter.dx.toInt(),
+            crossCenter.dy.toInt(),
+          ),
+        ),
       ),
     );
   }
