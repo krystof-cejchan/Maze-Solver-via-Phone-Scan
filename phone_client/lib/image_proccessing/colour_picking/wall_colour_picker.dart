@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image/image.dart' as img;
-import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/image_proccessing/image_cropping.dart';
 import '../../helpers/custom_image_class.dart' as custom;
 import 'route_and_wall_global_constants.dart';

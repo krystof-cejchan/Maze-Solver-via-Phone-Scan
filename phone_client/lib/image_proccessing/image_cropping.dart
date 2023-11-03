@@ -1,18 +1,15 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:image/src/image/image.dart';
 import 'package:phone_client/image_transformation/image2routes.dart';
 import '../helpers/custom_image_class.dart' as custom;
-import 'package:image/image.dart' as img show decodeImage;
 
 class ImageCropping extends StatefulWidget {
   const ImageCropping(
-      {Key? key,
+      {super.key,
       required this.image,
       required this.wallColour,
-      required this.routeColour})
-      : super(key: key);
+      required this.routeColour});
   final custom.Image image;
   final Color wallColour, routeColour;
 
@@ -38,7 +35,7 @@ class _ImageCroppingState extends State<ImageCropping>
           image: widget.image.bytes,
           onCropped: (croppedData) => setState(
             () {
-              print('heya');
+              // print('heya');
               _croppedData = croppedData;
             },
           ),

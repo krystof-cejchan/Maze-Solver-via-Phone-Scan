@@ -13,7 +13,7 @@ import 'classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordi
 
 class NormalizedPathDirections {
   final List<Coordinate> _pathCoordinates;
-  final custom.Image _imageMaze;
+  custom.Image _imageMaze;
   late final Queue<MappedDirectionsToCoordinates> mappedDirectionsToCoordinates;
   late final Queue<RobotInstructions> robotInstructions;
 
@@ -25,7 +25,7 @@ class NormalizedPathDirections {
   final _thresholdPixels = 20;
   final _threshold = 25;
   final _percentCoordinatesLength = 15;
-  final _minLengthOfCoordinates = 15;
+  final _minLengthOfCoordinates = 10;
   final _timesFoundWallLimit = 10;
 
   /// Normalizes a list of directions by removing consecutive identical directions
@@ -69,6 +69,15 @@ class NormalizedPathDirections {
               List<Coordinate>.from(
                 _pathCoordinates.sublist(S, --i),
               )));
+        } else if (mapDirToCoo.last.directions == curr) {
+          final last = mapDirToCoo.removeLast();
+          mapDirToCoo.add(
+            last
+              ..coordinates = [
+                ...last.coordinates,
+                ..._pathCoordinates.sublist(S, --i),
+              ],
+          );
         }
         // clear history and continue
         history.clear();
@@ -129,6 +138,8 @@ class NormalizedPathDirections {
   /// calculates if there is a crossroad that needs to be passed;
   /// if there is one, then in the robotinstructions a pass will be added among all the other instructions like right and left [RobotInstructions]
   Queue<RobotInstructions> _patchMappedDirectionsToCoordinates() {
+    List<Coordinate> lc = List.empty(growable: true);
+
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
         mappedDirectionsToCoordinates);
@@ -152,7 +163,7 @@ class NormalizedPathDirections {
         COORDINATES_FOR_LOOP:
         for (int i = percentageLength;
             i < cooLength - percentageLength;
-            i += 3) {
+            i += 1) {
           final coo = curr.coordinates[i];
           int x = coo.xCoordinate, y = coo.yCoordinate;
           int counter = 0;
@@ -174,14 +185,14 @@ class NormalizedPathDirections {
                 y++;
                 break;
             }
+            lc.add(Coordinate(x, y));
             counter++;
           }
-          print(pxFound);
+
           switch (pxFound) {
             case PxResult.foundCrossroad:
               robotInstructions.add(RobotInstructions.pass);
               mazeTarget = Maze.wall;
-              // i += 7;
               break;
             case PxResult.foundWall:
               if (++timesFoundWall < _timesFoundWallLimit) continue;
@@ -197,36 +208,42 @@ class NormalizedPathDirections {
       }
       curr = next;
     }
-
+    var cim = _imageMaze.image;
+    for (var c in lc) {
+      cim.setPixelRgb(c.xCoordinate, c.yCoordinate, 255, 166, 0);
+    }
+    _imageMaze = custom.Image(cim);
     return robotInstructions;
   }
 
-  ///TODO: needs to be consistent and bugproof
   PxResult _handlePixelInLoopContext(
     int x,
     int y,
     Maze searchingForMaze,
     int counter,
   ) {
-    ///pixel colour from x,y coordinates taken from [_imageMaze]
+    // Get the pixel color from the (x, y) coordinates of the image maze
     var pxColor = _imageMaze.getImagePixelColour(x, y);
 
-    ///has threshold been reached?
-    bool isTresholdReached = counter >= _thresholdPixels;
+    // Check if the threshold has been reached
+    bool isThresholdReached = counter >= _thresholdPixels;
 
     if (searchingForMaze == Maze.route) {
-      // we search for route | → white colour is expected
+      // We are searching for a route, and we expect white color
       if (pxColor == C.wall) {
         return PxResult
-            .foundMismatch; // black pixel found; stop looking for a crossroad
+            .foundMismatch; // A black pixel was found; stop looking for a crossroad
       }
-      // if white colour is found and the threshold is reached, we found a crossroad — else we keep on searching
-      return isTresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
+
+      // If a white color is found and the threshold is reached, we found a crossroad; otherwise, we keep on searching
+      return isThresholdReached ? PxResult.foundCrossroad : PxResult.foundRoute;
     } else if (searchingForMaze == Maze.wall) {
-      // we search for wall
+      // We are searching for a wall
       if (pxColor == C.route) {
-        // white pixel was found -- black is expected tho
-        return isTresholdReached ? PxResult.foundMismatch : PxResult.notYetWall;
+        // A white pixel was found, but we expect black
+        return isThresholdReached
+            ? PxResult.foundMismatch
+            : PxResult.notYetWall;
       } else if (pxColor == C.wall) {
         return PxResult.foundWall;
       }
