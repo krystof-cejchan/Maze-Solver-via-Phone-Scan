@@ -24,7 +24,7 @@ class _LoadingScreenForPathWidget extends State<LoadingScreenForPath> {
   Widget build(BuildContext context) {
     //TODO
     a();
-    return Text("");
+    return Text(" *describe what is happening in the background* ");
   }
 
 //TODO
