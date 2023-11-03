@@ -9,7 +9,7 @@ import 'package:image/image.dart' as img;
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
 
-  const CameraScreen({Key? key, required this.camera}) : super(key: key);
+  const CameraScreen({super.key, required this.camera});
   static const _res = ResolutionPreset.veryHigh;
   static final cameraPhotoResolution =
       CameraResolutionPixels.fromResolutionPreset(_res);

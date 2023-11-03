@@ -1,6 +1,5 @@
 import 'dart:collection';
 
-import 'package:image/image.dart' as img;
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
 import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
