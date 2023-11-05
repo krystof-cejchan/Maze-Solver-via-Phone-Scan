@@ -1,4 +1,9 @@
-*.css linguist-detectable=false
-*.js linguist-detectable=true
-*.java linguist-detectable=false
+* linguist-vendored
+*.ino linguist-vendored=false
+*.h linguist-vendored=false
+*.dart linguist-vendored=false
+*.swift linguist-vendored=false
+*.java linguist-vendored=false
+
+
 *.h linguist-language=C
