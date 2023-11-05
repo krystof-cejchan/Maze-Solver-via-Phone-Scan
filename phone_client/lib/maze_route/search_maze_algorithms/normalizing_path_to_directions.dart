@@ -1,15 +1,15 @@
 import 'dart:collection';
 
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
-import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
+import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
+import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
 
-import '../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
-import 'classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
-import 'classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
-import 'classes,enums,exceptions_for_route_algorithm/exceptions/wrong_followup_direction.dart';
-import 'classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordinates.dart';
+import '../../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
+import '../classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import '../classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
+import '../classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import '../classes,enums,exceptions_for_route_algorithm/exceptions/wrong_followup_direction.dart';
+import '../classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordinates.dart';
 
 class NormalizedPathDirections {
   final List<Coordinate> _pathCoordinates;
@@ -22,7 +22,7 @@ class NormalizedPathDirections {
     robotInstructions = _patchMappedDirectionsToCoordinates();
   }
 
-  final _thresholdPixels = 20;
+  final _thresholdPixels = 25;
   final _threshold = 25;
   final _percentCoordinatesLength = 15;
   final _minLengthOfCoordinates = 10;

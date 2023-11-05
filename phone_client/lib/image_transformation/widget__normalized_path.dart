@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
 
 class NormalizedPathWidget extends StatefulWidget {
   const NormalizedPathWidget(this.normDirections, {super.key, this.pathImage});
