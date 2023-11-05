@@ -49,6 +49,7 @@ dependencies:
   camerawesome: ^1.4.0
   flutter_native_image: ^0.0.6+1
   collection: ^1.17.2
+  flutter_blue_plus: ^1.26.0
 
 dev_dependencies:
   flutter_test:
@@ -66,7 +67,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+     - assets/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

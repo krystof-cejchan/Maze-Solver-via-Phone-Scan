@@ -254,3 +254,61 @@ class CameraPage extends StatelessWidget {
   }
 }
  */
+
+
+
+
+  /*void findTheShortestPathWithProgressFeedback(
+      custom.Image customImageCopy) async {
+    var currState = LoadingSnapshot(
+        "Analysing image", 0, (customImageCopy.w * customImageCopy.h));
+    _stateController.add(currState);
+    final List<List<int>> grid = List.empty(growable: true);
+    for (int i = 0; i < customImageCopy.w; i++) {
+      List<int> col = List.filled(customImageCopy.h, 0);
+      for (int j = 0; j < customImageCopy.h; j++) {
+        if (customImageCopy.isColourEqualToPixelColour(i, j, C.wall)) {
+          col[j] = 1;
+        }
+        _stateController.add(currState..curr = i * j);
+      }
+      grid.add(col);
+    }
+
+    _stateController
+        .add(currState = LoadingSnapshot("Finding the shortest path", 0, 3));
+    final List<Coordinate> shortestPath = PathInMatrix(
+      grid,
+      widget.coordinateStartToFinish,
+    ).foundPath;
+    _stateController.add(currState..curr = 1);
+    final normalizedDirections = NormalizedPathDirections(
+      shortestPath,
+      customImageCopy,
+    );
+    _stateController.add(currState..curr = 2);
+
+    final img.Image imgImageCopy = widget.pixels.image;
+    _stateController.add(currState..curr = 3);
+
+    _stateController.add(currState =
+        LoadingSnapshot("Visualizing the path", 0, shortestPath.length));
+    for (int i = 0; i < shortestPath.length; i++) {
+      _stateController.add(currState..curr = i);
+      final pieceOfPath = shortestPath[i];
+      imgImageCopy.setPixel(
+        pieceOfPath.xCoordinate,
+        pieceOfPath.yCoordinate,
+        img.ColorInt8.rgb(50, 255, 0),
+      );
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => NormalizedPathWidget(normalizedDirections,
+            pathImage: custom.Image(imgImageCopy)),
+      ),
+    );
+  }
+*/

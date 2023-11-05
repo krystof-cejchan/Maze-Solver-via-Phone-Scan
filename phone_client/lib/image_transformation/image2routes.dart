@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/image_transformation/loading_screen_shown_when_calculating_path.dart';
-import 'package:phone_client/image_transformation/widget__normalized_path.dart';
-import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
-import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
-import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
+import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
+import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/maze_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
-import '../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
+import 'widget__normalized_path.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
@@ -240,20 +239,52 @@ class _DestinationPickerState extends State<_DestinationPicker> {
     return Offset(px, py);
   }
 
-  //TODO: add a loading screen
   void _saveAndMoveOn() {
+    custom.Image customImageCopy = widget.customImage;
+    final coordinateStartToFinish = Coordinates(
+      widget.start.dx.toInt(),
+      widget.start.dy.toInt(),
+      crossCenter.dx.toInt(),
+      crossCenter.dy.toInt(),
+    );
+
+    final List<List<int>> grid = List.empty(growable: true);
+    for (int i = 0; i < customImageCopy.w; i++) {
+      List<int> col = List.filled(customImageCopy.h, 0);
+      for (int j = 0; j < customImageCopy.h; j++) {
+        if (customImageCopy.isColourEqualToPixelColour(i, j, C.wall)) {
+          col[j] = 1;
+        }
+      }
+      grid.add(col);
+    }
+
+    final List<Coordinate> shortestPath = PathInMatrix(
+      grid,
+      coordinateStartToFinish,
+    ).foundPath;
+
+    final normalizedDirections = NormalizedPathDirections(
+      shortestPath,
+      customImageCopy,
+    );
+
+    final img.Image imgImageCopy = widget.customImage.image;
+
+    for (int i = 0; i < shortestPath.length; i++) {
+      final pieceOfPath = shortestPath[i];
+      imgImageCopy.setPixel(
+        pieceOfPath.xCoordinate,
+        pieceOfPath.yCoordinate,
+        img.ColorInt8.rgb(50, 255, 0),
+      );
+    }
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LoadingScreenForPath(
-          widget.customImage,
-          Coordinates(
-            widget.start.dx.toInt(),
-            widget.start.dy.toInt(),
-            crossCenter.dx.toInt(),
-            crossCenter.dy.toInt(),
-          ),
-        ),
+        builder: (context) => NormalizedPathWidget(normalizedDirections,
+            pathImage: custom.Image(imgImageCopy)),
       ),
     );
   }
