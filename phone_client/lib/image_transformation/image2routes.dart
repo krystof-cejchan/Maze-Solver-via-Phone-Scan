@@ -3,11 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
+<<<<<<< HEAD
 import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
 import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/maze_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
+=======
+import 'package:phone_client/image_transformation/loading_screen_shown_when_calculating_path.dart';
+import 'package:phone_client/image_transformation/widget__normalized_path.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/route_algorithms/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/route_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/route_algorithms/search_for_shortest_path_in_array.dart';
+>>>>>>> origin/main
 import '../helpers/custom_image_class.dart' as custom;
 import 'widget__normalized_path.dart';
 
@@ -240,6 +249,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
   }
 
   void _saveAndMoveOn() {
+<<<<<<< HEAD
     custom.Image customImageCopy = widget.customImage;
     final coordinateStartToFinish = Coordinates(
       widget.start.dx.toInt(),
@@ -285,6 +295,20 @@ class _DestinationPickerState extends State<_DestinationPicker> {
       MaterialPageRoute(
         builder: (context) => NormalizedPathWidget(normalizedDirections,
             pathImage: custom.Image(imgImageCopy)),
+=======
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoadingScreenForPath(
+          widget.customImage,
+          Coordinates(
+            widget.start.dx.toInt(),
+            widget.start.dy.toInt(),
+            crossCenter.dx.toInt(),
+            crossCenter.dy.toInt(),
+          ),
+        ),
+>>>>>>> origin/main
       ),
     );
   }
