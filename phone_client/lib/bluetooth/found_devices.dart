@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:phone_client/bluetooth/bluetooth.dart';
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
 
+import 'bluetooth_controller.dart';
+
 class BluetoothDevices extends StatefulWidget implements BluetoothData {
   final Queue<RobotInstructions> robotInstructions;
   const BluetoothDevices(this.robotInstructions, {super.key});
