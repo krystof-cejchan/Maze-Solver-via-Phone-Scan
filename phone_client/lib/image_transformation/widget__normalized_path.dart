@@ -41,38 +41,17 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
       floatingActionButton: FloatingActionButton.small(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        onPressed: _bluetooth,
+        onPressed: _goto,
         child: const Icon(Icons.bluetooth_connected),
       ),
     );
   }
 
-  void _bluetooth({Queue<RobotInstructions>? robotInstructions}) async {
-    List<ScanResult> scanResults = [];
-    FlutterBluePlus.scanResults.listen(
-      (results) {
-        scanResults = results;
-      },
-      onError: (e) => throw BluetoothException(),
-    );
-
-    // Start scanning
-    await FlutterBluePlus.startScan();
-
-    // Stop scanning
-    await FlutterBluePlus.stopScan();
-
-    _goto(scanResults);
-  }
-
-  void _goto(List<ScanResult> scanResults,
-          {Queue<RobotInstructions>? robotInstructions}) =>
-      Navigator.push(
+  void _goto({Queue<RobotInstructions>? robotInstructions}) => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => BluetoothDevices(
             robotInstructions ?? widget.normDirections.robotInstructions,
-            scanResults,
           ),
         ),
       );

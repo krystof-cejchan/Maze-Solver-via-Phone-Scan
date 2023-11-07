@@ -44,8 +44,13 @@ class CameraScreenState extends State<CameraScreen> {
       await _controller.setFocusMode(FocusMode.auto);
 
       final xFile = await _controller.takePicture();
-      custom.Image customImage =
-          custom.Image(img.decodeImage(File(xFile.path).readAsBytesSync())!);
+      custom.Image customImage = custom.Image(
+        img.decodeImage(
+          File(
+            xFile.path,
+          ).readAsBytesSync(),
+        )!,
+      );
 
       File(xFile.path).deleteSync();
       if (customImage.isValid()) {
