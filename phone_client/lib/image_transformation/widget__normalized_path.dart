@@ -1,8 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:phone_client/bluetooth/bluetooth.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
 import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
@@ -41,38 +39,17 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
       floatingActionButton: FloatingActionButton.small(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        onPressed: _bluetooth,
+        onPressed: _goto,
         child: const Icon(Icons.bluetooth_connected),
       ),
     );
   }
 
-  void _bluetooth({Queue<RobotInstructions>? robotInstructions}) async {
-    List<ScanResult> scanResults = [];
-    FlutterBluePlus.scanResults.listen(
-      (results) {
-        scanResults = results;
-      },
-      onError: (e) => throw BluetoothException(),
-    );
-
-    // Start scanning
-    await FlutterBluePlus.startScan();
-
-    // Stop scanning
-    await FlutterBluePlus.stopScan();
-
-    _goto(scanResults);
-  }
-
-  void _goto(List<ScanResult> scanResults,
-          {Queue<RobotInstructions>? robotInstructions}) =>
-      Navigator.push(
+  void _goto({Queue<RobotInstructions>? robotInstructions}) => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => BluetoothDevices(
             robotInstructions ?? widget.normDirections.robotInstructions,
-            scanResults,
           ),
         ),
       );

@@ -50,6 +50,9 @@ dependencies:
   flutter_native_image: ^0.0.6+1
   collection: ^1.17.2
   flutter_blue_plus: ^1.26.0
+  get: ^4.6.6
+  image_picker: ^1.0.4
+  uuid: ^4.2.1
 
 dev_dependencies:
   flutter_test:
