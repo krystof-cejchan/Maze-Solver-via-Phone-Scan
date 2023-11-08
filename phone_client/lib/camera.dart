@@ -135,8 +135,10 @@ class CameraScreenState extends State<CameraScreen> {
   }
 
   void _browseGallery() async {
-    final iP = ImagePicker();
-    final XFile? pickedImg = await iP.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImg = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      preferredCameraDevice: CameraDevice.rear,
+    );
     if (pickedImg == null) return;
     custom.Image customImage = custom.Image(
       img.decodeImage(
