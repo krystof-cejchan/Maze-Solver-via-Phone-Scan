@@ -218,6 +218,8 @@ class _DestinationPickerState extends State<_DestinationPicker> {
             icon: const Icon(Icons.route_outlined)));
   }
 
+  void _browseGallery() {}
+
   void _onGuestureDetected(Offset globalPosition, Offset localPosition) {
     crossCenter = recalibrateOffset(globalPosition);
     localCrossCenter = localPosition;

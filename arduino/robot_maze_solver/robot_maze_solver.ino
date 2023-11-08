@@ -1,3 +1,5 @@
+#include <ArduinoQueue.h>
+
 //deklarace motory
 #define mLv 5 //motor levý - výkon
 #define mLs 7 //motor levý - směr
@@ -27,6 +29,7 @@ float sumaH;
 float err;
 long iSuma;
 
+const ArduinoQueue<RobotInstruction> instructions();
 
 void setup() {
   Serial.begin(9600);
@@ -63,8 +66,8 @@ void setup() {
 
 void loop() {
   ctiSenzory();
-  
-  if(isCrossroad()){
+
+  if (isCrossroad()) {
     zastav();
   }
 
@@ -100,8 +103,8 @@ void ctiSenzory()   {
   }
 }
 
-bool isCrossroad(){
-  return (hNorm[0]>hMin[0]-40&&hNorm[3]>hMin[3]-40);
+bool isCrossroad() {
+  return (hNorm[0] > hMin[0] - 40 && hNorm[3] > hMin[3] - 40);
 }
 /**
    nastaví rychlost motorů dopředu
@@ -123,3 +126,7 @@ void zastav() {
   digitalWrite(mPs, LOW);
   analogWrite(mPv, 0);
 }
+
+class RobotInstruction {
+
+};
