@@ -1,8 +1,6 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:phone_client/bluetooth/bluetooth.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
 import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';

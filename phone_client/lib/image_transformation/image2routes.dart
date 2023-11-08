@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
+import 'package:phone_client/hero_tag/hero_tag_generator.dart';
 import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
 import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
@@ -87,6 +88,7 @@ class _ImageConversionState extends State<ImageConversion> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
         floatingActionButton: FloatingActionButton.extended(
+            heroTag: HeroTag.distinguisher,
             backgroundColor: const Color.fromARGB(255, 0, 160, 5),
             foregroundColor: Colors.white,
             onPressed: _saveAndMoveOn,
@@ -94,9 +96,7 @@ class _ImageConversionState extends State<ImageConversion> {
             icon: const Icon(Icons.flag_circle)));
   }
 
-  custom.Image _colourMap(
-    final img.Image imgSource,
-  ) {
+  custom.Image _colourMap(final img.Image imgSource) {
     final filteredImg = imgSource;
     for (int x = 0; x < filteredImg.width; x++) {
       for (int y = 0; y < filteredImg.height; y++) {
@@ -104,8 +104,7 @@ class _ImageConversionState extends State<ImageConversion> {
             x,
             y,
             mapColours[_isPixelRepresentingRoute(
-              Library.pixelColour(imgSource.getPixel(x, y)),
-            )
+                    Library.pixelColour(imgSource.getPixel(x, y)))
                 ? 'R'
                 : 'W']!);
       }
@@ -211,14 +210,13 @@ class _DestinationPickerState extends State<_DestinationPicker> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
         floatingActionButton: FloatingActionButton.extended(
+            heroTag: HeroTag.distinguisher,
             backgroundColor: const Color.fromARGB(255, 79, 255, 85),
             foregroundColor: const Color.fromARGB(195, 0, 0, 0),
             onPressed: _saveAndMoveOn,
             label: const Text('Find the shortest path'),
             icon: const Icon(Icons.route_outlined)));
   }
-
-  void _browseGallery() {}
 
   void _onGuestureDetected(Offset globalPosition, Offset localPosition) {
     crossCenter = recalibrateOffset(globalPosition);

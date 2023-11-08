@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 
@@ -7,7 +8,9 @@ class BluetoothController extends GetxController {
 
     FlutterBluePlus.scanResults.listen((results) {
       for (ScanResult r in results) {
-        print('${r.device.advName} found! rssi: ${r.rssi}');
+        if (kDebugMode) {
+          print('${r.device.advName} found! rssi: ${r.rssi}');
+        }
       }
     });
 

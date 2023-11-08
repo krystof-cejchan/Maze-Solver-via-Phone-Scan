@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:phone_client/helpers/camera_resolution_px.dart';
+import 'package:phone_client/hero_tag/hero_tag_generator.dart';
 import 'package:phone_client/image_proccessing/colour_picking/route_colour_picker.dart';
 import './helpers/custom_image_class.dart' as custom;
 import 'package:image/image.dart' as img;
@@ -95,6 +96,7 @@ class CameraScreenState extends State<CameraScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             FloatingActionButton.extended(
+              heroTag: HeroTag.distinguisher,
               backgroundColor: Colors.green,
               foregroundColor: Colors.black87,
               onPressed: _captureAndSaveImage,
@@ -108,6 +110,7 @@ class CameraScreenState extends State<CameraScreen> {
               width: 10,
             ),
             FloatingActionButton.extended(
+              heroTag: HeroTag.distinguisher,
               backgroundColor: Colors.blueAccent,
               foregroundColor: Colors.white70,
               onPressed: _browseGallery,
@@ -143,7 +146,7 @@ class CameraScreenState extends State<CameraScreen> {
       )!,
     );
 
-    File(pickedImg.path).deleteSync();
+    //File(pickedImg.path).deleteSync();
     if (customImage.isValid()) {
       _openImageInNewRoute(customImage);
     }
