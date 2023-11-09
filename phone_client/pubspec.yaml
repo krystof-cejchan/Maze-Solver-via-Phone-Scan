@@ -46,13 +46,12 @@ dependencies:
   image_size_getter: ^2.1.2
   device_info_plus: ^9.0.3
   fluttertoast: ^8.2.2
-  camerawesome: ^1.4.0
   flutter_native_image: ^0.0.6+1
   collection: ^1.17.2
-  flutter_blue_plus: ^1.26.0
   get: ^4.6.6
   image_picker: ^1.0.4
   uuid: ^4.2.1
+  flutter_blue: ^0.8.0
 
 dev_dependencies:
   flutter_test:

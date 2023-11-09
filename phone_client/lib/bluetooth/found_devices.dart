@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
 import 'package:phone_client/bluetooth/bluetooth.dart';
 import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
@@ -22,69 +22,49 @@ class _BluetoothState extends State<BluetoothDevices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("BLE SCANNER"),
+        centerTitle: true,
+      ),
       body: GetBuilder<BluetoothController>(
         init: BluetoothController(),
         builder: (controller) {
-          return SingleChildScrollView(
+          return Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20 * 3),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      controller.scanDevices();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      minimumSize: const Size(350, 55),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                    ),
-                    child: const Text(
-                      'Scan',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
+                const SizedBox(
+                  height: 15,
                 ),
-                const SizedBox(height: 20),
                 StreamBuilder<List<ScanResult>>(
-                  stream: controller.scanResults,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final device = snapshot.data![index].device;
-                          return Card(
-                            elevation: 2,
-                            child: ListTile(
-                              onTap: () {},
-                              title: Text(device.advName),
-                              subtitle: Text(device.remoteId.str),
-                              trailing: TextButton(
-                                onPressed: () {
-                                  controller.connectToDevice(device);
-                                },
-                                child: Text(
-                                  FlutterBluePlus.connectedDevices
-                                          .contains(device)
-                                      ? 'Connected'
-                                      : 'Connect',
+                    stream: controller.scanResults,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              final data = snapshot.data![index];
+                              return Card(
+                                elevation: 2,
+                                child: ListTile(
+                                  title: Text(data.device.toString()),
+                                  subtitle: Text(data.device.id.id),
+                                  trailing: Text(data.rssi.toString()),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    } else {
-                      return const Center(
-                        child: Text('No devices found'),
-                      );
-                    }
-                  },
+                              );
+                            });
+                      } else {
+                        return const Center(
+                          child: Text("No Device Found"),
+                        );
+                      }
+                    }),
+                ElevatedButton(
+                    onPressed: () => controller.scanDevices(),
+                    child: const Text("Scan")),
+                const SizedBox(
+                  height: 15,
                 ),
               ],
             ),

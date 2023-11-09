@@ -1,19 +1,23 @@
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothController extends GetxController {
-  Future<List<ScanResult>> scanDevices() async {
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 5));
-    List<ScanResult> res = [];
-    FlutterBluePlus.scanResults.listen((results) => res.addAll(results));
-
-    await FlutterBluePlus.stopScan();
-    return res;
+  FlutterBlue flutterBlue = FlutterBlue.instance;
+  Future scanDevices() async {
+    var blePermission = await Permission.bluetoothScan.status;
+    if (blePermission.isDenied) {
+      if (await Permission.bluetoothScan.request().isGranted) {
+        if (await Permission.bluetoothConnect.request().isGranted) {
+          flutterBlue.startScan(timeout: const Duration(seconds: 10));
+          flutterBlue.stopScan();
+        }
+      }
+    } else {
+      flutterBlue.startScan(timeout: const Duration(seconds: 10));
+      flutterBlue.stopScan();
+    }
   }
 
-  Stream<List<ScanResult>> get scanResults => scanDevices().asStream();
-
-  Future<void> connectToDevice(BluetoothDevice device) async {
-    await device.connect();
-  }
+  Stream<List<ScanResult>> get scanResults => flutterBlue.scanResults;
 }
