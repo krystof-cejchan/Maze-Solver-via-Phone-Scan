@@ -4,6 +4,9 @@ import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothController extends GetxController {
   FlutterBlue flutterBlue = FlutterBlue.instance;
+
+  Stream<List<ScanResult>> get scanResults => flutterBlue.scanResults;
+
   Future scanDevices() async {
     var blePermission = await Permission.bluetoothScan.status;
     if (blePermission.isDenied) {
@@ -19,5 +22,12 @@ class BluetoothController extends GetxController {
     }
   }
 
-  Stream<List<ScanResult>> get scanResults => flutterBlue.scanResults;
+  void connectTo(BluetoothDevice target) =>
+      target.connect(timeout: const Duration(seconds: 10));
+
+  bool isDeviceConnected(BluetoothDevice target) {
+    bool x = false;
+    flutterBlue.connectedDevices.then((value) => x = value.contains(target));
+    return x;
+  }
 }
