@@ -1,8 +1,8 @@
 import 'dart:collection';
 
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
 
 import '../../image_proccessing/colour_picking/route_and_wall_global_constants.dart';
 import '../classes,enums,exceptions_for_route_algorithm/coordinate.dart';

@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
 
 import '../classes,enums,exceptions_for_route_algorithm/node.dart';
 
@@ -8,12 +8,14 @@ class PathInMatrix {
   late final List<Coordinate> foundPath;
 
   PathInMatrix(List<List<int>> grid, Coordinates coordinates) {
-    foundPath = findPath(grid, coordinates);
+    foundPath = findPathUsingAStar(grid, coordinates);
   }
 
   ///an algorithm to find the shortest path from a starting [coordinates] to an end [coordinates]
   ///in a 2d matrix   (where 0 represent a route and 1 represent walls)
-  List<Coordinate> findPath(List<List<int>> grid, Coordinates coordinates) {
+  /// https://www.geeksforgeeks.org/a-search-algorithm/
+  List<Coordinate> findPathUsingAStar(
+      List<List<int>> grid, Coordinates coordinates) {
     final openList = PriorityQueue<Node>((a, b) => (a.f - b.f).toInt());
     final closedList = <Node, Node>{};
     final startNode = Node(coordinates.startX, coordinates.startY);
@@ -29,9 +31,8 @@ class PathInMatrix {
 
       closedList[currentNode] = currentNode;
 
-      FOR:
       for (final neighbor in _getNeighbors(grid, currentNode)) {
-        if (closedList.containsKey(neighbor)) continue FOR;
+        if (closedList.containsKey(neighbor)) continue;
 
         final tentativeG = currentNode.g + 1.0; // Cardinal movement cost
 
@@ -52,9 +53,8 @@ class PathInMatrix {
   }
 
   ///manhattan distance heuristic for horizontal and vertical movement
-  double _heuristic(Node a, Node b) {
-    return (a.x - b.x).abs().toDouble() + (a.y - b.y).abs().toDouble();
-  }
+  double _heuristic(Node a, Node b) =>
+      (a.x - b.x).abs().toDouble() + (a.y - b.y).abs().toDouble();
 
   /// returns neighbors from [directions]
   List<Node> _getNeighbors(List<List<int>> grid, Node node) {

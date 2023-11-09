@@ -1,25 +1,33 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothController extends GetxController {
-  Future scanDevices() async {
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 5));
+  FlutterBlue flutterBlue = FlutterBlue.instance;
 
-    FlutterBluePlus.scanResults.listen((results) {
-      for (ScanResult r in results) {
-        if (kDebugMode) {
-          print('${r.device.advName} found! rssi: ${r.rssi}');
+  Stream<List<ScanResult>> get scanResults => flutterBlue.scanResults;
+
+  Future scanDevices() async {
+    var blePermission = await Permission.bluetoothScan.status;
+    if (blePermission.isDenied) {
+      if (await Permission.bluetoothScan.request().isGranted) {
+        if (await Permission.bluetoothConnect.request().isGranted) {
+          flutterBlue.startScan(timeout: const Duration(seconds: 10));
+          flutterBlue.stopScan();
         }
       }
-    });
-
-    await FlutterBluePlus.stopScan();
+    } else {
+      flutterBlue.startScan(timeout: const Duration(seconds: 10));
+      flutterBlue.stopScan();
+    }
   }
 
-  Stream<List<ScanResult>> get scanResults => FlutterBluePlus.scanResults;
+  void connectTo(BluetoothDevice target) =>
+      target.connect(timeout: const Duration(seconds: 10));
 
-  Future<void> connectToDevice(BluetoothDevice device) async {
-    await device.connect();
+  bool isDeviceConnected(BluetoothDevice target) {
+    bool x = false;
+    flutterBlue.connectedDevices.then((value) => x = value.contains(target));
+    return x;
   }
 }

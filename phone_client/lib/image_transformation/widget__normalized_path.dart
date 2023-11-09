@@ -2,8 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
-import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import 'package:phone_client/image_to_route/search_maze_algorithms/normalizing_path_to_directions.dart';
 
 import '../bluetooth/found_devices.dart';
 

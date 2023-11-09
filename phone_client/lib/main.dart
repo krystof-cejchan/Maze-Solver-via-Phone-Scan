@@ -1,14 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:phone_client/camera.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (await FlutterBluePlus.isSupported == false) {
-    return;
-  }
-
   final cameras = await availableCameras();
   runApp(
     MyApp(
