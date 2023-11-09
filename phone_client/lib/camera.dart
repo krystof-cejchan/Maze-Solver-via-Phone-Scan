@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:phone_client/helpers/camera_resolution_px.dart';
 import 'package:phone_client/hero_tag/hero_tag_generator.dart';
 import 'package:phone_client/image_proccessing/colour_picking/route_colour_picker.dart';
 import './helpers/custom_image_class.dart' as custom;
@@ -10,11 +9,7 @@ import 'package:image/image.dart' as img;
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
-
   const CameraScreen({super.key, required this.camera});
-  static const _res = ResolutionPreset.veryHigh;
-  static final cameraPhotoResolution =
-      CameraResolutionPixels.fromResolutionPreset(_res);
   @override
   CameraScreenState createState() => CameraScreenState();
 }
@@ -28,7 +23,7 @@ class CameraScreenState extends State<CameraScreen> {
     super.initState();
     _controller = CameraController(
       widget.camera,
-      CameraScreen._res,
+      ResolutionPreset.veryHigh,
       enableAudio: false,
     );
     _initializeControllerFuture = _controller.initialize();
@@ -122,14 +117,6 @@ class CameraScreenState extends State<CameraScreen> {
             ),
           ],
         ),
-        /*floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.black87,
-          onPressed: _captureAndSaveImage,
-          label: const Text('Take a photo'),
-          icon: const Icon(Icons.camera_alt_rounded),
-        ),*/
       ),
     );
   }

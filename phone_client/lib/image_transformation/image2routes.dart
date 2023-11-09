@@ -5,10 +5,10 @@ import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/hero_tag/hero_tag_generator.dart';
 import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'package:phone_client/maze_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
-import 'package:phone_client/maze_route/search_maze_algorithms/normalizing_path_to_directions.dart';
-import 'package:phone_client/maze_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/image_to_route/search_maze_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/image_to_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
 import 'widget__normalized_path.dart';
 

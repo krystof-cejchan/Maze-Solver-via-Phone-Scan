@@ -1,23 +1,17 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 
 class BluetoothController extends GetxController {
-  Future scanDevices() async {
+  Future<List<ScanResult>> scanDevices() async {
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 5));
-
-    FlutterBluePlus.scanResults.listen((results) {
-      for (ScanResult r in results) {
-        if (kDebugMode) {
-          print('${r.device.advName} found! rssi: ${r.rssi}');
-        }
-      }
-    });
+    List<ScanResult> res = [];
+    FlutterBluePlus.scanResults.listen((results) => res.addAll(results));
 
     await FlutterBluePlus.stopScan();
+    return res;
   }
 
-  Stream<List<ScanResult>> get scanResults => FlutterBluePlus.scanResults;
+  Stream<List<ScanResult>> get scanResults => scanDevices().asStream();
 
   Future<void> connectToDevice(BluetoothDevice device) async {
     await device.connect();
