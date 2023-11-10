@@ -70,13 +70,18 @@ class _BluetoothState extends State<BluetoothDevices> {
                                 onPressed: () {
                                   controller.connectTo(device);
                                 },
-                                child: Text(
-                                  controller.isDeviceConnected(device)
-                                      ? 'Connected'
-                                      : 'Connect',
-                                  style: const TextStyle(
+                                child: StreamBuilder<List<BluetoothDevice>>(
+                                  builder: (context, snapshot) => Text(
+                                    (snapshot.hasData &&
+                                            snapshot.data!.contains(device))
+                                        ? 'Connected'
+                                        : 'Connect',
+                                    style: const TextStyle(
                                       color: Colors.black54,
-                                      decoration: TextDecoration.underline),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                  stream: controller.isDeviceConnected(device),
                                 ),
                               ),
                             ),
@@ -85,7 +90,12 @@ class _BluetoothState extends State<BluetoothDevices> {
                       );
                     } else {
                       return const Center(
-                        child: Text('No devices found'),
+                        child: Text(
+                          'No devices found',
+                          style: TextStyle(
+                            color: Colors.deepOrange,
+                          ),
+                        ),
                       );
                     }
                   },

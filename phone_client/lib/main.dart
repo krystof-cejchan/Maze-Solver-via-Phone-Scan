@@ -6,14 +6,12 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final cameras = await availableCameras();
   runApp(
-    MyApp(
-      camera: cameras.first,
-    ),
+    MyApp(cameras.first),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.camera});
+  const MyApp(this.camera, {super.key});
 
   final CameraDescription camera;
 
@@ -26,9 +24,7 @@ class MyApp extends StatelessWidget {
             seedColor: const Color.fromARGB(255, 231, 174, 5)),
         useMaterial3: true,
       ),
-      home: CameraScreen(
-        camera: camera,
-      ),
+      home: CameraScreen(camera),
     );
   }
 }

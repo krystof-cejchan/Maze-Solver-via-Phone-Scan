@@ -9,7 +9,7 @@ import 'package:image/image.dart' as img;
 
 class CameraScreen extends StatefulWidget {
   final CameraDescription camera;
-  const CameraScreen({super.key, required this.camera});
+  const CameraScreen(this.camera, {super.key});
   @override
   CameraScreenState createState() => CameraScreenState();
 }
