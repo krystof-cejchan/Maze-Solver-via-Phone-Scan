@@ -10,7 +10,7 @@ import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_a
 import 'package:phone_client/image_to_route/search_maze_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/image_to_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
 import '../helpers/custom_image_class.dart' as custom;
-import 'widget__normalized_path.dart';
+import 'normalized_path_widget.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
@@ -92,7 +92,7 @@ class _ImageConversionState extends State<ImageConversion> {
             backgroundColor: const Color.fromARGB(255, 0, 160, 5),
             foregroundColor: Colors.white,
             onPressed: _saveAndMoveOn,
-            label: const Text('Pick the destination'),
+            label: const Text('Save the start and pick the destination'),
             icon: const Icon(Icons.flag_circle)));
   }
 
@@ -214,7 +214,7 @@ class _DestinationPickerState extends State<_DestinationPicker> {
             backgroundColor: const Color.fromARGB(255, 79, 255, 85),
             foregroundColor: const Color.fromARGB(195, 0, 0, 0),
             onPressed: _saveAndMoveOn,
-            label: const Text('Find the shortest path'),
+            label: const Text('Save and find the shortest path'),
             icon: const Icon(Icons.route_outlined)));
   }
 

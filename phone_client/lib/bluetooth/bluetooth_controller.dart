@@ -25,9 +25,6 @@ class BluetoothController extends GetxController {
   void connectTo(BluetoothDevice target) =>
       target.connect(timeout: const Duration(seconds: 10));
 
-  bool isDeviceConnected(BluetoothDevice target) {
-    bool x = false;
-    flutterBlue.connectedDevices.then((value) => x = value.contains(target));
-    return x;
-  }
+  Stream<List<BluetoothDevice>> isDeviceConnected(BluetoothDevice target) =>
+      flutterBlue.connectedDevices.asStream();
 }
