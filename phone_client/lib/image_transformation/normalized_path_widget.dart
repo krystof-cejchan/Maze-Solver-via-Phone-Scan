@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
 import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
@@ -20,9 +21,9 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
         children: [
-          Image.memory(widget.pathImage!.bytes),
+          Image.memory(widget.pathImage!.bytes, fit: BoxFit.fitWidth),
           Flexible(
             child: Text(
               widget.normDirections.robotInstructions.toString(),
@@ -33,14 +34,14 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
               ),
             ),
           ),
+          ElevatedButton(
+            onPressed: _goto,
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(239, 140, 255, 200),
+                foregroundColor: Colors.blueAccent),
+            child: const Icon(Icons.bluetooth_audio_sharp),
+          ),
         ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton.small(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        onPressed: _goto,
-        child: const Icon(Icons.bluetooth_connected),
       ),
     );
   }
