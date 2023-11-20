@@ -29,7 +29,7 @@ float sumaH;
 float err;
 long iSuma;
 
-const ArduinoQueue<RobotInstruction> instructions();
+//const ArduinoQueue<RobotInstruction> instructions();
 
 void setup() {
   Serial.begin(9600);
@@ -67,9 +67,9 @@ void setup() {
 void loop() {
   ctiSenzory();
 
-  if (isCrossroad()) {
+  /*if (isCrossroad()) {
     zastav();
-  }
+  }*/
 
   sumaVH = 0;
   sumaH = 0;

@@ -67,9 +67,12 @@ class _BluetoothState extends State<BluetoothDevices> {
                               subtitle: Text(device.id.id),
                               isThreeLine: false,
                               trailing: TextButton(
-                                onPressed: () {
-                                  controller.connectTo(device);
-                                },
+                                onPressed: () => controller.sendData(
+                                    widget.data.toString(), device),
+                                /*controller.sendData(
+                                    widget.data,
+                                    device,
+                                  );*/
                                 child: StreamBuilder<List<BluetoothDevice>>(
                                   builder: (context, snapshot) => Text(
                                     (snapshot.hasData &&
