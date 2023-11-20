@@ -1,6 +1,7 @@
+#include<SoftwareSerial.h>
 #include <ArduinoQueue.h>
 
-//deklarace motory
+//deklarace motor
 #define mLv 5 //motor levý - výkon
 #define mLs 7 //motor levý - směr
 #define mPv 6 //motor pravý - výkon
@@ -23,16 +24,37 @@ const int vP = 200;
 const int vL = 200;
 const int P = 100;
 const int I = 0;
-const int vahy[4] = { -4, -1, 1, 4};
+const int vahy[4] = { -3, -1, 1, 3};
 float sumaVH;
 float sumaH;
 float err;
 long iSuma;
 
-//const ArduinoQueue<RobotInstruction> instructions();
+SoftwareSerial bt(2, 3); /* (Rx,Tx) */
+
+enum dir {LEFT, RIGHT, PASS};
+struct RobotInstruction {
+  char brand[10];
+  char model[10];
+  dir dirE;
+};
+
+ArduinoQueue<RobotInstruction> robotInstructions(200);
+
 
 void setup() {
+  bt.begin(9600);
   Serial.begin(9600);
+
+  /*while (robotInstructions.isEmpty()) {
+    if (bt.available())
+    {
+      String data;
+      data = bt.read();
+      //TODO zpracuj přijímání dat, tak aby se data uložily do queue
+    }
+    }*/
+
   //motory
   pinMode(mLs, OUTPUT);
   pinMode(mLv, OUTPUT);
@@ -44,17 +66,18 @@ void setup() {
     hMin[i] = 1023;
     hMax[i] = 0;
   }
-  delay(5000);
+  delay(3000);
+Serial.print("ahoj");
 
   jed(0, 150);
   long t0 = millis();
-  while ((millis() - t0) < 10000) {
+  while ((millis() - t0) < 5000) {
     for (int i = 0; i < 4; i++) {
       int hodnotaCidla = analogRead(A0 + i);
       if (hodnotaCidla < hMin[i]) {
         hMin[i] = hodnotaCidla;
       }
-      else if (hodnotaCidla > hMax[i]) {
+      if (hodnotaCidla > hMax[i]) {
         hMax[i] = hodnotaCidla;
       }
     }
@@ -65,32 +88,18 @@ void setup() {
 }
 
 void loop() {
+
   ctiSenzory();
 
-  /*if (isCrossroad()) {
-    zastav();
-  }*/
-
-  sumaVH = 0;
-  sumaH = 0;
-  for (int i = 0; i < 4; i++) {
-    sumaVH += (hNorm[i] * vahy[i]);
-    sumaH += hNorm[i];
-  }
-  err = sumaVH / sumaH;
-  korekce = int(P * err);
-
-  iSuma += err;
-
-  if ((iSuma * err) < -10)
-    iSuma = 0;
-
-  korekce = int((P * err) + (I * iSuma));
+  pocitej();
 
   mL = constrain(vL - korekce, 0, 255);
   mP = constrain(vP + korekce, 0, 255);
 
+
   jed(mL, mP);
+
+
 }
 /**
    uloží hodnoty ze senzorů do pole
@@ -103,18 +112,37 @@ void ctiSenzory()   {
   }
 }
 
-bool isCrossroad() {
-  return (hNorm[0] > hMin[0] - 40 && hNorm[3] > hMin[3] - 40);
+// Spočítá všechny potřebné normované hodnoty
+void pocitej() {
+  sumaVH = 0;
+  sumaH = 0;
+  for (int i = 0; i < 4; i++) {
+    sumaVH += (hNorm[i] * vahy[i]);
+    sumaH += hNorm[i];
+  }
+  err = sumaVH / sumaH;
+  korekce = int(P * err);
 }
+boolean jeAlesponJednaNaCerne() {
+  int v;
+  const byte m = 100;
+  for (int i = 0; i < 4; i++) {
+    hodnotaAkt = analogRead(A0 + i);
+    v = int((100.0 * (1.0 * (hodnotaAkt - hMin[i]))) / (1.0 * (hMax[i] - hMin[i]))); //čtení hodnot z čidel
+    if (constrain(v, 0, m) > 50)return true;
+  }
+  return false;
+}
+
 /**
    nastaví rychlost motorů dopředu
    @param rychlostL rychlost levého motoru
    @param rychlostP rychlost pravého motoru
 */
 void jed(int rychlostL, int rychlostP) {
-  digitalWrite(mLs, LOW);
+  digitalWrite(mLs, HIGH);
   analogWrite(mLv, rychlostP);
-  digitalWrite(mPs, LOW);
+  digitalWrite(mPs, HIGH);
   analogWrite(mPv, rychlostL);
 }
 /**
@@ -126,7 +154,3 @@ void zastav() {
   digitalWrite(mPs, LOW);
   analogWrite(mPv, 0);
 }
-
-class RobotInstruction {
-
-};
