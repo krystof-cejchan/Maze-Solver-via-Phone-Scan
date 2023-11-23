@@ -4,9 +4,10 @@
 //motors
 #define motorLeftPower 5
 #define motorLeftDirection 7
-#define motorRightPower 6 
-#define motorRightDirection 8 
+#define motorRightPower 6
+#define motorRightDirection 8
 
+SoftwareSerial bt(2, 3); /* (Rx,Tx) */
 
 //declaration of variables and constants
 int minValues[4];
@@ -34,26 +35,37 @@ float sumValues;
 long sumOfI;
 const int boostedWeight = 12;
 
-SoftwareSerial bt(2, 3); /* (Rx,Tx) */
-
 enum dir {LEFT, RIGHT, PASS};
 
-ArduinoQueue<dir> directions = ArduinoQueue<dir>();
+ArduinoQueue<dir> directions;
 
+// given that input is in the following pattern:
+//  {RobotInstruction.X1, RobotInstruction.X2, .  .  ., RobotInstruction.Xn}
+ArduinoQueue<dir> acceptInput(String rawInput) {
+  dir accaptable[3] = {PASS, LEFT, RIGHT};
+  ArduinoQueue<dir> dirs = ArduinoQueue<dir>();
+  for (int i = 0; i < rawInput.length(); i++) {
+    switch (rawInput.charAt(i)) {
+      case 'P': dirs.enqueue(PASS); break;
+      case 'L': dirs.enqueue(LEFT); break;
+      case 'R': dirs.enqueue(RIGHT); break;
+    }
+  }
+  return dirs;
+}
 
 void setup() {
   bt.begin(9600);
   Serial.begin(9600);
 
-  /*while (directions.isEmotorRightSpeedty()) {
+  while (directions.isEmpty()) {
     if (bt.available())
     {
       String data;
       data = bt.read();
-      //TODO zpracuj přijímání dat, tak aby se data uložily do queue
+      directions = acceptInput(data);
     }
-    }*/
-
+  }
   //motory
   pinMode(motorLeftDirection, OUTPUT);
   pinMode(motorLeftPower, OUTPUT);
@@ -116,13 +128,13 @@ void loop() {
   }
 }
 
+
 /**
    saves sensor-read values to an array
 */
 void readSensors()   {
   for (int i = 0; i < 4; i++)
     normalizedValues[i] = constrain(normValue(i), 0, 100);
-
 }
 
 // calculates deviation
