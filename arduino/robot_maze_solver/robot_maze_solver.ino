@@ -2,10 +2,10 @@
 #include <ArduinoQueue.h>
 
 //motors
-#define motorLeftPower 5 //motor levý - výkon
-#define motorLeftDirection 7 //motor levý - směr
-#define motorRightPower 6 //motor pravý - výkon
-#define motorRightDirection 8 //motor pravý - směr
+#define motorLeftPower 5
+#define motorLeftDirection 7
+#define motorRightPower 6 
+#define motorRightDirection 8 
 
 
 //declaration of variables and constants
@@ -109,16 +109,13 @@ void loop() {
   motorLeftSpeed = constrain(defMotorLeftSpeed - correction, 0, 255);
   motorRightSpeed = constrain(defMotorRightSpeed + correction, 0, 255);
 
-
-
   go(motorLeftSpeed, motorRightSpeed);
 
   if (isCrossroad(currDir)) {
     directions.dequeue();
   }
-
-
 }
+
 /**
    saves sensor-read values to an array
 */

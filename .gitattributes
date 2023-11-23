@@ -7,4 +7,4 @@
 *.java linguist-vendored=false
 *.cmake linguist-vendored=false
 
-*.h linguist-language=C
+
