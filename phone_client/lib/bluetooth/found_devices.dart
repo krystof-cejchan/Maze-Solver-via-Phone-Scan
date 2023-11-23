@@ -12,7 +12,7 @@ class BluetoothDevices extends StatefulWidget implements BluetoothData {
   final Queue<RobotInstructions> robotInstructions;
   const BluetoothDevices(this.robotInstructions, {super.key});
   @override
-  get data => robotInstructions;
+  String get data => robotInstructions.toString();
 
   @override
   State<StatefulWidget> createState() => _BluetoothState();
@@ -67,9 +67,12 @@ class _BluetoothState extends State<BluetoothDevices> {
                               subtitle: Text(device.id.id),
                               isThreeLine: false,
                               trailing: TextButton(
-                                onPressed: () {
-                                  controller.connectTo(device);
-                                },
+                                onPressed: () =>
+                                    controller.sendData(widget.data, device),
+                                /*controller.sendData(
+                                    widget.data,
+                                    device,
+                                  );*/
                                 child: StreamBuilder<List<BluetoothDevice>>(
                                   builder: (context, snapshot) => Text(
                                     (snapshot.hasData &&
