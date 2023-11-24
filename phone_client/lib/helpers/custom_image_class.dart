@@ -4,12 +4,17 @@ import 'package:image/image.dart' as img show Image, decodeImage;
 import 'package:phone_client/helpers/lib_class.dart';
 
 class Image {
-  final img.Image image;
-  final Uint8List bytes;
+  late final img.Image image;
+  late final Uint8List bytes;
   late final int w = image.width, h = image.height;
   late final int length = w * h;
 
   Image(this.image) : bytes = Library.imageAsBytes(image);
+  Image.preResized(img.Image image, {int? height, int? width}) {
+    this.image = img.Image.fromResized(image,
+        width: width ?? 1080, height: height ?? 1920);
+    bytes = Library.imageAsBytes(this.image);
+  }
   Image.fromBytes(this.bytes) : image = img.decodeImage(bytes)!;
 
   bool isValid() => image.isValid;

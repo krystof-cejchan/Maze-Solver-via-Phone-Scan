@@ -32,9 +32,7 @@ class _BluetoothState extends State<BluetoothDevices> {
                 const SizedBox(height: 20 * 3),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      controller.scanDevices();
-                    },
+                    onPressed: () => controller.scanDevices(),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: const Color.fromARGB(197, 33, 149, 243),

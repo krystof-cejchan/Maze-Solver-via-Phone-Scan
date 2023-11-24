@@ -127,12 +127,9 @@ class CameraScreenState extends State<CameraScreen> {
       preferredCameraDevice: CameraDevice.rear,
     );
     if (pickedImg == null) return;
+
     custom.Image customImage = custom.Image(
-      img.decodeImage(
-        File(
-          pickedImg.path,
-        ).readAsBytesSync(),
-      )!,
+      img.decodeImage(await File(pickedImg.path).readAsBytes())!,
     );
 
     //File(pickedImg.path).deleteSync();
