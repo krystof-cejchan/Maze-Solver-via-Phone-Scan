@@ -1,265 +1,298 @@
-import 'dart:io';
-
-import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:crop/crop.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:phone_client/image_transformation/image2routes.dart';
+
+import '../helpers/lib_class.dart';
 
 class ImageCropping extends StatefulWidget {
-  const ImageCropping({
-    super.key,
-    required this.image,
-    required this.wallColour,
-    required this.routeColour,
-  });
-
+  const ImageCropping(
+      {super.key,
+      required this.image,
+      required this.wallColour,
+      required this.routeColour});
   final custom.Image image;
   final Color wallColour, routeColour;
 
   @override
-  _ImageCroppingState createState() => _ImageCroppingState();
+  State<ImageCropping> createState() => _ImageCroppingState();
 }
 
 class _ImageCroppingState extends State<ImageCropping> {
-  XFile? _pickedFile;
-  CroppedFile? _croppedFile;
+  late final _defaultAspectRatio = widget.image.aspectRatio;
+  late final controller = CropController(aspectRatio: _defaultAspectRatio);
+  double _rotation = 0;
+  BoxShape shape = BoxShape.rectangle;
+
+  void _cropImage() async {
+    final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+    final ui.Image? cropped = await controller.crop(pixelRatio: pixelRatio);
+
+    if (cropped == null || !mounted) {
+      return;
+    }
+    final custom.Image cImage = await Library.defImageToCustomImage(cropped);
+    print(cImage); //TODO on next activity, the image does not show up!
+    _nextActivitySync(cImage);
+  }
+
+  void _nextActivitySync(custom.Image cImg) => _nextActivity(context, cImg);
+
+  void _nextActivity(BuildContext context, custom.Image cImg) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+            ImageConversion(cImg, widget.wallColour, widget.routeColour),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (kIsWeb)
-            Padding(
-              padding: const EdgeInsets.all(kIsWeb ? 24.0 : 16.0),
-              child: Text(
-                "Crop Image",
-                style: Theme.of(context)
-                    .textTheme
-                    .displayMedium!
-                    .copyWith(color: Theme.of(context).highlightColor),
-              ),
-            ),
-          Expanded(child: _body()),
+      appBar: AppBar(
+        actions: <Widget>[
+          IconButton(
+            onPressed: _cropImage,
+            tooltip: 'Crop',
+            icon: const Icon(Icons.crop),
+          )
         ],
       ),
-    );
-  }
-
-  Widget _body() {
-    if (_croppedFile != null || _pickedFile != null) {
-      return _imageCard();
-    } else {
-      return _uploaderCard();
-    }
-  }
-
-  Widget _imageCard() {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: kIsWeb ? 24.0 : 16.0),
-            child: Card(
-              elevation: 4.0,
-              child: Padding(
-                padding: const EdgeInsets.all(kIsWeb ? 24.0 : 16.0),
-                child: _image(),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              color: Colors.black,
+              padding: const EdgeInsets.all(8),
+              child: Crop(
+                onChanged: (decomposition) {
+                  if (_rotation != decomposition.rotation) {
+                    setState(() {
+                      _rotation = ((decomposition.rotation + 180) % 360) - 180;
+                    });
+                  }
+                },
+                controller: controller,
+                shape: shape,
+                /* It's very important to set `fit: BoxFit.cover`.*/
+                helper: shape == BoxShape.rectangle
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: const ui.Color.fromARGB(255, 101, 222, 100),
+                            width: 2,
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                      )
+                    : null,
+                child: Image.memory(
+                  widget.image.bytes,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 24.0),
-          _menu(),
-        ],
-      ),
-    );
-  }
-
-  Widget _image() {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    if (_croppedFile != null) {
-      final path = _croppedFile!.path;
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 0.8 * screenWidth,
-          maxHeight: 0.7 * screenHeight,
-        ),
-        child: kIsWeb ? Image.network(path) : Image.file(File(path)),
-      );
-    } else if (_pickedFile != null) {
-      final path = _pickedFile!.path;
-      return ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 0.8 * screenWidth,
-          maxHeight: 0.7 * screenHeight,
-        ),
-        child: kIsWeb ? Image.network(path) : Image.file(File(path)),
-      );
-    } else {
-      return const SizedBox.shrink();
-    }
-  }
-
-  Widget _menu() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        FloatingActionButton(
-          onPressed: () {
-            _clear();
-          },
-          backgroundColor: Colors.redAccent,
-          tooltip: 'Delete',
-          child: const Icon(Icons.delete),
-        ),
-        if (_croppedFile == null)
-          Padding(
-            padding: const EdgeInsets.only(left: 32.0),
-            child: FloatingActionButton(
-              onPressed: () {
-                _cropImage();
-              },
-              backgroundColor: const Color(0xFFBC764A),
-              tooltip: 'Crop',
-              child: const Icon(Icons.crop),
-            ),
-          )
-      ],
-    );
-  }
-
-  Widget _uploaderCard() {
-    return Center(
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        child: SizedBox(
-          width: kIsWeb ? 380.0 : 320.0,
-          height: 300.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+          Row(
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(Icons.undo),
+                tooltip: 'Undo',
+                onPressed: () {
+                  controller.rotation = 0;
+                  controller.scale = 1;
+                  controller.offset = Offset.zero;
+                  setState(() {
+                    _rotation = 0;
+                  });
+                },
+              ),
               Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: DottedBorder(
-                    radius: const Radius.circular(12.0),
-                    borderType: BorderType.RRect,
-                    dashPattern: const [8, 4],
-                    color: Theme.of(context).highlightColor.withOpacity(0.4),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.image,
-                            color: Theme.of(context).highlightColor,
-                            size: 80.0,
-                          ),
-                          const SizedBox(height: 24.0),
-                          Text(
-                            'Upload an image to start',
-                            style: kIsWeb
-                                ? Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall!
-                                    .copyWith(
-                                        color: Theme.of(context).highlightColor)
-                                : Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(
-                                      color: Theme.of(context).highlightColor,
-                                    ),
-                          ),
-                        ],
-                      ),
-                    ),
+                child: SliderTheme(
+                  data: theme.sliderTheme.copyWith(
+                    trackShape: CenteredRectangularSliderTrackShape(),
+                  ),
+                  child: Slider(
+                    divisions: 360,
+                    value: _rotation,
+                    min: -180,
+                    max: 180,
+                    label: '$_rotation°',
+                    onChanged: (n) {
+                      setState(() {
+                        _rotation = n.roundToDouble();
+                        controller.rotation = _rotation;
+                      });
+                    },
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _uploadImage();
-                  },
-                  child: const Text('Upload'),
-                ),
+              PopupMenuButton<double>(
+                icon: const Icon(Icons.aspect_ratio),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: _defaultAspectRatio,
+                    child: const Text(
+                      "Original (Width/Height)",
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: widget.image.swappedAspectRatio,
+                    child: const Text(
+                      "Height/Width",
+                    ),
+                  ),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem(
+                    value: 16.0 / 9.0,
+                    child: Text("16:9"),
+                  ),
+                  const PopupMenuItem(
+                    value: 4.0 / 3.0,
+                    child: Text("4:3"),
+                  ),
+                  const PopupMenuItem(
+                    value: 1,
+                    child: Text("1:1"),
+                  ),
+                  const PopupMenuItem(
+                    value: 3.0 / 4.0,
+                    child: Text("3:4"),
+                  ),
+                  const PopupMenuItem(
+                    value: 9.0 / 16.0,
+                    child: Text("9:16"),
+                  ),
+                ],
+                tooltip: 'Aspect Ratio',
+                onSelected: (double selected) {
+                  controller.aspectRatio = selected;
+                  setState(() {});
+                },
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }
+}
 
-  Future<void> _cropImage() async {
-    if (_pickedFile != null) {
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: _pickedFile!.path,
-        compressFormat: ImageCompressFormat.jpg,
-        compressQuality: 100,
-        uiSettings: [
-          AndroidUiSettings(
-              toolbarTitle: 'Cropper',
-              toolbarColor: Colors.deepOrange,
-              toolbarWidgetColor: Colors.white,
-              initAspectRatio: CropAspectRatioPreset.original,
-              lockAspectRatio: false),
-          IOSUiSettings(
-            title: 'Cropper',
-          ),
-          WebUiSettings(
-            context: context,
-            presentStyle: CropperPresentStyle.dialog,
-            boundary: const CroppieBoundary(
-              width: 520,
-              height: 520,
-            ),
-            viewPort:
-                const CroppieViewPort(width: 480, height: 480, type: 'circle'),
-            enableExif: true,
-            enableZoom: true,
-            showZoomer: true,
-          ),
-        ],
+class CenteredRectangularSliderTrackShape extends RectangularSliderTrackShape {
+  @override
+  void paint(
+    PaintingContext context,
+    Offset offset, {
+    required RenderBox parentBox,
+    required SliderThemeData sliderTheme,
+    required Animation<double> enableAnimation,
+    required TextDirection textDirection,
+    required Offset thumbCenter,
+    Offset? secondaryOffset,
+    bool isDiscrete = false,
+    bool isEnabled = false,
+  }) {
+    if (sliderTheme.trackHeight! <= 0) {
+      return;
+    }
+
+    final ColorTween activeTrackColorTween = ColorTween(
+        begin: sliderTheme.disabledActiveTrackColor,
+        end: sliderTheme.activeTrackColor);
+    final ColorTween inactiveTrackColorTween = ColorTween(
+        begin: sliderTheme.disabledInactiveTrackColor,
+        end: sliderTheme.inactiveTrackColor);
+    final Paint activePaint = Paint()
+      ..color = activeTrackColorTween.evaluate(enableAnimation)!;
+    final Paint inactivePaint = Paint()
+      ..color = inactiveTrackColorTween.evaluate(enableAnimation)!;
+
+    final Rect trackRect = getPreferredRect(
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
+    );
+    final trackCenter = trackRect.center;
+    final Size thumbSize =
+        sliderTheme.thumbShape!.getPreferredSize(isEnabled, isDiscrete);
+
+    if (trackCenter.dx < thumbCenter.dx) {
+      final Rect leftTrackSegment = Rect.fromLTRB(
+          trackRect.left,
+          trackRect.top,
+          min(trackCenter.dx, thumbCenter.dx - thumbSize.width / 2),
+          trackRect.bottom);
+      if (!leftTrackSegment.isEmpty) {
+        context.canvas.drawRect(leftTrackSegment, inactivePaint);
+      }
+
+      final activeRect = Rect.fromLTRB(
+          trackCenter.dx, trackRect.top, thumbCenter.dx, trackRect.bottom);
+      if (!activeRect.isEmpty) {
+        context.canvas.drawRect(activeRect, activePaint);
+      }
+
+      final Rect rightTrackSegment = Rect.fromLTRB(
+          thumbCenter.dx + thumbSize.width / 2,
+          trackRect.top,
+          trackRect.right,
+          trackRect.bottom);
+      if (!rightTrackSegment.isEmpty) {
+        context.canvas.drawRect(rightTrackSegment, inactivePaint);
+      }
+    } else if (trackCenter.dx > thumbCenter.dx) {
+      final Rect leftTrackSegment = Rect.fromLTRB(trackRect.left, trackRect.top,
+          thumbCenter.dx + thumbSize.width / 2, trackRect.bottom);
+      if (!leftTrackSegment.isEmpty) {
+        context.canvas.drawRect(leftTrackSegment, inactivePaint);
+      }
+
+      final activeRect = Rect.fromLTRB(
+        thumbCenter.dx + thumbSize.width / 2,
+        trackRect.top,
+        trackRect.center.dx,
+        trackRect.bottom,
       );
-      if (croppedFile != null) {
-        setState(() {
-          _croppedFile = croppedFile;
-        });
+      if (!activeRect.isEmpty) {
+        context.canvas.drawRect(activeRect, activePaint);
+      }
+
+      final Rect rightTrackSegment = Rect.fromLTRB(
+        max(trackCenter.dx, thumbCenter.dx - thumbSize.width / 2),
+        trackRect.top,
+        trackRect.right,
+        trackRect.bottom,
+      );
+
+      if (!rightTrackSegment.isEmpty) {
+        context.canvas.drawRect(rightTrackSegment, inactivePaint);
+      }
+    } else {
+      final Rect leftTrackSegment = Rect.fromLTRB(
+          trackRect.left,
+          trackRect.top,
+          min(trackCenter.dx, thumbCenter.dx - thumbSize.width / 2),
+          trackRect.bottom);
+      if (!leftTrackSegment.isEmpty) {
+        context.canvas.drawRect(leftTrackSegment, inactivePaint);
+      }
+
+      final Rect rightTrackSegment = Rect.fromLTRB(
+          min(trackCenter.dx, thumbCenter.dx - thumbSize.width / 2),
+          trackRect.top,
+          trackRect.right,
+          trackRect.bottom);
+      if (!rightTrackSegment.isEmpty) {
+        context.canvas.drawRect(rightTrackSegment, inactivePaint);
       }
     }
-  }
-
-  Future<void> _uploadImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        _pickedFile = pickedFile;
-      });
-    }
-  }
-
-  void _clear() {
-    setState(() {
-      _pickedFile = null;
-      _croppedFile = null;
-    });
   }
 }

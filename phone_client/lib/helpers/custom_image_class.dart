@@ -8,14 +8,16 @@ class Image {
   late final Uint8List bytes;
   late final int w = image.width, h = image.height;
   late final int length = w * h;
+  late final double aspectRatio = h / w, swappedAspectRatio = w / h;
+  final String? path;
 
-  Image(this.image) : bytes = Library.imageAsBytes(image);
-  Image.preResized(img.Image image, {int? height, int? width}) {
+  Image(this.image, {this.path}) : bytes = Library.imageAsBytes(image);
+  Image.preResized(img.Image image, {this.path, int? height, int? width}) {
     this.image = img.Image.fromResized(image,
         width: width ?? 1080, height: height ?? 1920);
     bytes = Library.imageAsBytes(this.image);
   }
-  Image.fromBytes(this.bytes) : image = img.decodeImage(bytes)!;
+  Image.fromBytes(this.bytes, {this.path}) : image = img.decodeImage(bytes)!;
 
   bool isValid() => image.isValid;
 
@@ -28,4 +30,7 @@ class Image {
       getImagePixelColour(x, y) == color;
 
   bool isXYWithinBounds(int x, int y) => x < w && x > 0 && y < h && y > 0;
+
+  @override
+  String toString() => image.toString();
 }

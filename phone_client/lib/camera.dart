@@ -47,9 +47,10 @@ class CameraScreenState extends State<CameraScreen> {
             xFile.path,
           ).readAsBytesSync(),
         )!,
+        path: xFile.path,
       );
 
-      File(xFile.path).deleteSync();
+      //File(xFile.path).deleteSync();
       if (customImage.isValid()) {
         _openImageInNewRoute(customImage);
       }
@@ -130,6 +131,7 @@ class CameraScreenState extends State<CameraScreen> {
 
     custom.Image customImage = custom.Image(
       img.decodeImage(await File(pickedImg.path).readAsBytes())!,
+      path: pickedImg.path,
     );
 
     //File(pickedImg.path).deleteSync();
