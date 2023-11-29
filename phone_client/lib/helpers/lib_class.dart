@@ -11,9 +11,15 @@ mixin Library on Object {
   static Color pixelColour(img.Pixel p) =>
       Color.fromARGB(p.a.toInt(), p.r.toInt(), p.g.toInt(), p.b.toInt());
 
-  static Future<custom.Image> defImageToCustomImage(Image img) async {
-    return custom.Image.fromBytes(
-      (await img.toByteData(format: ImageByteFormat.png))!.buffer.asUint8List(),
-    );
+  // ignore: provide_deprecation_message
+  @deprecated
+  static Future<custom.Image> defImageToCustomImage(Image image) async {
+    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+    if (byteData != null) {
+      Uint8List uint8List = byteData.buffer.asUint8List();
+      return custom.Image(img.decodeImage(uint8List)!);
+    } else {
+      throw Exception('Failed to convert ui.Image to custom.Image');
+    }
   }
 }

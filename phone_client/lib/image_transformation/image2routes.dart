@@ -1,4 +1,7 @@
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui';
+import 'dart:ui' as ui show Image;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
@@ -16,24 +19,20 @@ import 'normalized_path_widget.dart';
 /// Based on the image, it turns pixels into a 'R' or 'W' depending on the pixel colour.
 class ImageConversion extends StatefulWidget {
   const ImageConversion._(
-    this.customImage,
-    this.edImage,
+    this.uiImage,
     this.routeColour,
     this.wallColour,
   );
 
   factory ImageConversion(
-      custom.Image customImage, Color colourOfRoute, Color colourOfWall) {
+      ui.Image uiImg, Color colourOfRoute, Color colourOfWall) {
     return ImageConversion._(
-      customImage,
-      customImage.image,
+      uiImg,
       colourOfRoute,
       colourOfWall,
     );
   }
-
-  final custom.Image customImage;
-  final img.Image edImage;
+  final ui.Image uiImage;
   final Color routeColour, wallColour;
 
   @override
@@ -45,14 +44,22 @@ class _ImageConversionState extends State<ImageConversion> {
     'R': img.ColorInt8.rgb(0, 0, 0),
     'W': img.ColorInt8.rgb(255, 255, 255),
   };
-
   final GlobalKey imageKey = GlobalKey();
   late GlobalKey currentKey;
-  late custom.Image routedImage = _colourMap(widget.edImage);
+  late custom.Image customImage, routedImage;
+  img.Image? imgImage;
   Offset crossCenter = Offset.zero, localCrossCenter = Offset.zero;
   @override
   void initState() {
     currentKey = imageKey;
+    convertFlutterUiToImage(widget.uiImage).then((img.Image image) {
+      customImage = custom.Image(image);
+      setState(() {
+        routedImage = _colourMap(customImage.image);
+        imgImage = customImage.image;
+      });
+      print(customImage);
+    });
     super.initState();
   }
 
@@ -71,12 +78,12 @@ class _ImageConversionState extends State<ImageConversion> {
             }),
             child: Stack(
               children: [
-                Image.memory(
-                  routedImage.bytes,
-                  fit: BoxFit.scaleDown,
-                  repeat: ImageRepeat.noRepeat,
-                  key: imageKey,
-                ),
+                imgImage != null
+                    ? Image.memory(
+                        customImage.bytes,
+                        key: imageKey,
+                      )
+                    : const Center(child: CircularProgressIndicator()),
                 CustomPaint(
                   size: const Size(200, 200),
                   painter: CrossPainter(localCrossCenter,
@@ -144,6 +151,23 @@ class _ImageConversionState extends State<ImageConversion> {
           builder: (context) =>
               _DestinationPicker(routedImage, localCrossCenter, crossCenter)),
     );
+  }
+
+  Future<Uint8List?> convertImageToBytes(ui.Image image) async {
+    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
+  Future<img.Image> convertFlutterUiToImage(ui.Image uiImage) async {
+    final uiBytes = await uiImage.toByteData();
+
+    final image = img.Image.fromBytes(
+        width: uiImage.width,
+        height: uiImage.height,
+        bytes: uiBytes!.buffer,
+        numChannels: 4);
+
+    return image;
   }
 }
 

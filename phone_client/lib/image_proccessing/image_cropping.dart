@@ -34,19 +34,20 @@ class _ImageCroppingState extends State<ImageCropping> {
     if (cropped == null || !mounted) {
       return;
     }
-    final custom.Image cImage = await Library.defImageToCustomImage(cropped);
-    print(cImage); //TODO on next activity, the image does not show up!
-    _nextActivitySync(cImage);
+    //final custom.Image cImage = await Library.defImageToCustomImage(cropped);
+    //print(cImage); //TODO on next activity, the image does not show up!
+    _nextActivitySync(null, cropped);
   }
 
-  void _nextActivitySync(custom.Image cImg) => _nextActivity(context, cImg);
+  void _nextActivitySync(custom.Image? cImg, ui.Image uiImg) =>
+      _nextActivity(context, cImg, uiImg);
 
-  void _nextActivity(BuildContext context, custom.Image cImg) {
+  void _nextActivity(BuildContext context, custom.Image? cImg, ui.Image uiImg) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ImageConversion(cImg, widget.wallColour, widget.routeColour),
+            ImageConversion(uiImg, widget.wallColour, widget.routeColour),
       ),
     );
   }

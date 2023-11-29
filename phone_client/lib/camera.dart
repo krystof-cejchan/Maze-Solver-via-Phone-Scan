@@ -40,7 +40,7 @@ class CameraScreenState extends State<CameraScreen> {
       await _controller.setFlashMode(FlashMode.off);
       await _controller.setFocusMode(FocusMode.auto);
 
-      final xFile = await _controller.takePicture();
+      final XFile xFile = await _controller.takePicture();
       custom.Image customImage = custom.Image(
         img.decodeImage(
           File(
