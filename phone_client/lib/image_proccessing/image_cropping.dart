@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:crop/crop.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/image_transformation/image2routes.dart';
+import 'package:phone_client/image_transformation/start_picker.dart';
 
 class ImageCropping extends StatefulWidget {
   const ImageCropping(
@@ -31,8 +31,7 @@ class _ImageCroppingState extends State<ImageCropping> {
     if (cropped == null || !mounted) {
       return;
     }
-    //final custom.Image cImage = await Library.defImageToCustomImage(cropped);
-    //print(cImage); //TODO on next activity, the image does not show up!
+
     _nextActivitySync(null, cropped);
   }
 

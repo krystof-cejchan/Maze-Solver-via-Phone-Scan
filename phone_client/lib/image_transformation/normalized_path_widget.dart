@@ -22,15 +22,13 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
     return Scaffold(
       body: ListView(
         children: [
-          Image.memory(widget.pathImage!.bytes, fit: BoxFit.fitWidth),
-          Flexible(
-            child: Text(
-              widget.normDirections.robotInstructions.toString(),
-              style: const TextStyle(
-                fontSize: 12,
-                backgroundColor: Colors.black87,
-                color: Colors.lightBlue,
-              ),
+          Image.memory(widget.pathImage!.bytes),
+          Text(
+            widget.normDirections.robotInstructions.toString(),
+            style: const TextStyle(
+              fontSize: 12,
+              backgroundColor: Colors.black87,
+              color: Colors.lightBlue,
             ),
           ),
           ElevatedButton(
