@@ -3,10 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:crop/crop.dart';
 import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:phone_client/image_transformation/image2routes.dart';
-
-import '../helpers/lib_class.dart';
 
 class ImageCropping extends StatefulWidget {
   const ImageCropping(

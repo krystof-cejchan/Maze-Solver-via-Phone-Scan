@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui show Image;
 import 'package:flutter/material.dart';
@@ -41,82 +41,86 @@ class ImageConversion extends StatefulWidget {
 
 class _ImageConversionState extends State<ImageConversion> {
   final mapColours = {
-    'R': img.ColorInt8.rgb(0, 0, 0),
-    'W': img.ColorInt8.rgb(255, 255, 255),
+    'R': img.ColorInt8.rgb(255, 0, 0),
+    'W': img.ColorInt8.rgb(40, 80, 255),
   };
   final GlobalKey imageKey = GlobalKey();
   late GlobalKey currentKey;
-  late custom.Image customImage, routedImage;
+  custom.Image? customImage, routedImage;
   img.Image? imgImage;
   Offset crossCenter = Offset.zero, localCrossCenter = Offset.zero;
+  final StreamController<custom.Image> _stateController =
+      StreamController<custom.Image>();
+
   @override
   void initState() {
     currentKey = imageKey;
     convertFlutterUiToImage(widget.uiImage).then((img.Image image) {
-      customImage = custom.Image(image);
       setState(() {
-        routedImage = _colourMap(customImage.image);
-        imgImage = customImage.image;
+        customImage = custom.Image(image);
+        imgImage = customImage!.image;
       });
-      print(customImage);
-    });
+    }).whenComplete(() => _colourMap(imgImage!));
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-          child: GestureDetector(
-            onTapDown: (details) => setState(() {
-              crossCenter = recalibrateOffset(details.globalPosition);
-              localCrossCenter = details.localPosition;
-            }),
-            onPanUpdate: (details) => setState(() {
-              crossCenter = recalibrateOffset(details.globalPosition);
-              localCrossCenter = details.localPosition;
-            }),
-            child: Stack(
-              children: [
-                imgImage != null
+      body: Center(
+        child: GestureDetector(
+          onTapDown: (details) => setState(() {
+            crossCenter = recalibrateOffset(details.globalPosition);
+            localCrossCenter = details.localPosition;
+          }),
+          onPanUpdate: (details) => setState(() {
+            crossCenter = recalibrateOffset(details.globalPosition);
+            localCrossCenter = details.localPosition;
+          }),
+          child: Stack(
+            children: [
+              StreamBuilder(
+                stream: _stateController.stream,
+                initialData: null,
+                builder: (context, snapshot) => snapshot.hasData
                     ? Image.memory(
-                        customImage.bytes,
+                        snapshot.data!.bytes,
                         key: imageKey,
                       )
-                    : const Center(child: CircularProgressIndicator()),
-                CustomPaint(
-                  size: const Size(200, 200),
-                  painter: CrossPainter(localCrossCenter,
-                      color: const Color.fromARGB(255, 29, 167, 236)),
-                ),
-              ],
-            ),
+                    : const CircularProgressIndicator(),
+              ),
+              CustomPaint(
+                size: const Size(200, 200),
+                painter: CrossPainter(localCrossCenter,
+                    color: const Color.fromARGB(255, 29, 167, 236)),
+              ),
+            ],
           ),
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
-        floatingActionButton: FloatingActionButton.extended(
-            heroTag: HeroTag.distinguisher,
-            backgroundColor: const Color.fromARGB(255, 0, 160, 5),
-            foregroundColor: Colors.white,
-            onPressed: _saveAndMoveOn,
-            label: const Text('Save the start and pick the destination'),
-            icon: const Icon(Icons.flag_circle)));
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: HeroTag.distinguisher,
+        backgroundColor: const Color.fromARGB(255, 0, 160, 5),
+        foregroundColor: Colors.white,
+        onPressed: _saveAndMoveOn,
+        label: const Text('Save the start and pick the destination'),
+        icon: const Icon(Icons.flag_circle),
+      ),
+    );
   }
 
-  custom.Image _colourMap(final img.Image imgSource) {
+  void _colourMap(final img.Image imgSource) {
     final filteredImg = imgSource;
     for (int x = 0; x < filteredImg.width; x++) {
       for (int y = 0; y < filteredImg.height; y++) {
-        filteredImg.setPixel(
-            x,
-            y,
-            mapColours[_isPixelRepresentingRoute(
-                    Library.pixelColour(imgSource.getPixel(x, y)))
-                ? 'R'
-                : 'W']!);
+        var b = _isPixelRepresentingRoute(
+            Library.pixelColour(imgSource.getPixel(x, y)));
+        filteredImg.setPixel(x, y, mapColours[b ? 'R' : 'W']!);
       }
     }
-    return custom.Image(filteredImg);
+    _stateController.add(custom.Image(filteredImg));
   }
 
   Offset recalibrateOffset(Offset globalPosition) {
@@ -125,7 +129,7 @@ class _ImageConversionState extends State<ImageConversion> {
     Offset localPosition = box.globalToLocal(Offset(
         globalPosition.dx - CrossPainter.fingerOffset,
         globalPosition.dy - CrossPainter.fingerOffset));
-    double widgetScale = box.size.width / routedImage.w;
+    double widgetScale = box.size.width / routedImage!.w;
     double px = localPosition.dx / widgetScale,
         py = localPosition.dy / widgetScale;
 
@@ -148,14 +152,10 @@ class _ImageConversionState extends State<ImageConversion> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              _DestinationPicker(routedImage, localCrossCenter, crossCenter)),
+        builder: (context) =>
+            _DestinationPicker(routedImage!, localCrossCenter, crossCenter),
+      ),
     );
-  }
-
-  Future<Uint8List?> convertImageToBytes(ui.Image image) async {
-    ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
-    return byteData!.buffer.asUint8List();
   }
 
   Future<img.Image> convertFlutterUiToImage(ui.Image uiImage) async {
@@ -165,6 +165,7 @@ class _ImageConversionState extends State<ImageConversion> {
         width: uiImage.width,
         height: uiImage.height,
         bytes: uiBytes!.buffer,
+        format: img.Format.uint8,
         numChannels: 4);
 
     return image;
