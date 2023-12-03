@@ -16,8 +16,12 @@ class CrossPainter extends CustomPainter {
       ..strokeWidth = 1.05;
 
     const crossLength = 20;
-    crossCenter =
-        Offset(crossCenter.dx - fingerOffset, crossCenter.dy - fingerOffset);
+    crossCenter = Offset(
+      crossCenter.dx - fingerOffset,
+      crossCenter.dy - fingerOffset,
+    );
+    //print("${crossCenter.dx} ${crossCenter.dy}");
+
     //horizontal line of the cross
     canvas.drawLine(
       Offset(crossCenter.dx - crossLength, crossCenter.dy),
