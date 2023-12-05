@@ -17,14 +17,14 @@ class Image {
         width: width ?? 1080, height: height ?? 1920);
     bytes = Library.imageAsBytes(this.image);
   }
-  Image.preResizedFromBytes(this.bytes, {this.path, int? height, int? width}) {
+  /*Image.preResizedFromBytes(this.bytes, {this.path, int? height, int? width}) {
     var x = img.decodeImage(bytes);
     image =
         img.Image.fromResized(x!, width: width ?? 1080, height: height ?? 1920);
-  }
+  }*/
   Image.fromBytes(this.bytes, {this.path}) : image = img.decodeImage(bytes)!;
 
-  bool isValid() => image.isValid;
+  bool isValid() => (image.isValid && bytes.isNotEmpty);
 
   bool isNotValid() => !isValid();
 
