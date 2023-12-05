@@ -15,6 +15,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: './phone_client'
+        
     steps:
       - uses: actions/checkout@v3
 
