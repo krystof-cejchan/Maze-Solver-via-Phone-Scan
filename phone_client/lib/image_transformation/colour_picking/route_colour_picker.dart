@@ -2,15 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import '../../helpers/custom_image_class.dart' as custom;
-import '../image_cropping.dart';
-import 'route_and_wall_global_constants.dart';
+import 'package:phone_client/image_transformation/colour_picking/route_and_wall_global_constants.dart';
+import '../../custom_image_class/custom_image_class.dart' as custom;
+import './wall_colour_picker.dart' as wall;
 
 class ColorPickerWidget extends StatefulWidget {
-  const ColorPickerWidget(
-      {super.key, required this.image, required this.routeColour});
+  const ColorPickerWidget({super.key, required this.image});
   final custom.Image image;
-  final Color routeColour;
   @override
   ColorPickerWidgetState createState() => ColorPickerWidgetState();
 }
@@ -19,14 +17,14 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   late final custom.Image _image;
   GlobalKey imageKey = GlobalKey();
   GlobalKey paintKey = GlobalKey();
-  late GlobalKey currentKey;
 
   int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
+  Color pickedRouteColour = C.wall;
 
-  Color pickedWallRoute = C.route;
+  late GlobalKey currentKey;
 
   final StreamController<Color> _stateController = StreamController<Color>();
-  final Color initColour = const Color.fromARGB(255, 238, 238, 238);
+  final initColour = const Color.fromARGB(255, 36, 36, 36);
   @override
   void initState() {
     currentKey = imageKey;
@@ -71,7 +69,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
             foregroundColor: _invertColour(colour),
             onPressed: _saveAndMoveOn,
             icon: const Icon(Icons.colorize_outlined),
-            label: Text('Save Wall Colour',
+            label: Text('Save Route Colour',
                 style: TextStyle(
                     color: _invertColour(colour), backgroundColor: colour)),
           );
@@ -81,11 +79,10 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   }
 
   Color _invertColour(Color color) => Color.fromARGB(
-        (color.opacity * 255).round(),
-        255 - color.red,
-        255 - color.green,
-        255 - color.blue,
-      );
+      (color.opacity * 255).round(),
+      255 - color.red,
+      255 - color.green,
+      255 - color.blue);
 
   void searchPixel(Offset globalPosition) {
     if (_image.isNotValid()) {
@@ -108,7 +105,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     try {
       Color colour = _image.getImagePixelColour(px.round(), py.round());
       _stateController.add(colour);
-      pickedWallRoute = colour;
+      pickedRouteColour = colour;
     } on RangeError {
       if (_haveFiveSecondsPassed()) {
         Fluttertoast.showToast(
@@ -135,10 +132,9 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ImageCropping(
+        builder: (context) => wall.ColorPickerWidget(
           image: _image,
-          routeColour: widget.routeColour,
-          wallColour: pickedWallRoute,
+          routeColour: pickedRouteColour,
         ),
       ),
     );

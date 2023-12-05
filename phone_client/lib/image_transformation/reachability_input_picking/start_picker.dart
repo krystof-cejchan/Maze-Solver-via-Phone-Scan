@@ -5,9 +5,10 @@ import 'dart:ui' as ui show Image;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
+import 'package:phone_client/custom_image_class/custom_image_class.dart'
+    as custom;
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/hero_tag/hero_tag_generator.dart';
-import '../helpers/custom_image_class.dart' as custom;
+import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
 import 'destination_picker.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
@@ -81,11 +82,12 @@ class _ImageConversionState extends State<ImageConversion> {
               (routedImage != null
                   ? Container(
                       decoration: BoxDecoration(
-                          border: Border.all(
-                        color: const Color.fromARGB(255, 29, 167, 236),
-                        width: 2,
-                        style: BorderStyle.solid,
-                      )),
+                        border: Border.all(
+                          color: const Color.fromARGB(255, 29, 167, 236),
+                          width: 2,
+                          style: BorderStyle.solid,
+                        ),
+                      ),
                       child: Image.memory(
                         routedImage!.bytes,
                         key: imageKey,

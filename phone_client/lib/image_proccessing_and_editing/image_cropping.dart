@@ -2,8 +2,9 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:crop/crop.dart';
-import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/image_transformation/start_picker.dart';
+import 'package:phone_client/custom_image_class/custom_image_class.dart'
+    as custom;
+import 'package:phone_client/image_transformation/reachability_input_picking/start_picker.dart';
 
 class ImageCropping extends StatefulWidget {
   const ImageCropping(

@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:phone_client/hero_tag/hero_tag_generator.dart';
-import 'package:phone_client/image_proccessing/colour_picking/route_colour_picker.dart';
-import './helpers/custom_image_class.dart' as custom;
+import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
+import 'package:phone_client/image_transformation/colour_picking/route_colour_picker.dart';
+import 'custom_image_class/custom_image_class.dart' as custom;
 import 'package:image/image.dart' as img;
 
 class CameraScreen extends StatefulWidget {
@@ -50,7 +50,7 @@ class CameraScreenState extends State<CameraScreen> {
         path: xFile.path,
       );
 
-      //File(xFile.path).deleteSync();
+      await File(xFile.path).delete();
       if (customImage.isValid()) {
         _openImageInNewRoute(customImage);
       }

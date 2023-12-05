@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
 import 'package:phone_client/bluetooth/bluetooth.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import 'package:phone_client/image_convertion_algorithm/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
 
 import 'bluetooth_controller.dart';
 
