@@ -79,9 +79,17 @@ class _ImageConversionState extends State<ImageConversion> {
           child: Stack(
             children: [
               (routedImage != null
-                  ? Image.memory(
-                      routedImage!.bytes,
-                      key: imageKey,
+                  ? Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                        color: const Color.fromARGB(255, 29, 167, 236),
+                        width: 2,
+                        style: BorderStyle.solid,
+                      )),
+                      child: Image.memory(
+                        routedImage!.bytes,
+                        key: imageKey,
+                      ),
                     )
                   : const Center(
                       child: CircularProgressIndicator(

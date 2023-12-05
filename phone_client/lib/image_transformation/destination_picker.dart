@@ -53,9 +53,13 @@ class _DestinationPickerState extends State<DestinationPicker> {
             }),
             child: Stack(
               children: [
-                Image.memory(
-                  widget.customImage.bytes,
-                  key: imageKey,
+                Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.redAccent)),
+                  child: Image.memory(
+                    widget.customImage.bytes,
+                    key: imageKey,
+                  ),
                 ),
                 CustomPaint(
                   size: const Size(200, 200),
