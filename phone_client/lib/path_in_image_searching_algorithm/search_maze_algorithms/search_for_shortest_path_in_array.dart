@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
 
 import '../classes,enums,exceptions_for_route_algorithm/node.dart';
 

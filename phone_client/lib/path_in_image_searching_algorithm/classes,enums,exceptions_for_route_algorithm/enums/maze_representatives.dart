@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart' show Color;
-import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
+import 'package:phone_client/image_transformation/colour_picking/route_and_wall_global_constants.dart';
 
 enum Maze {
   wall(C.wall),

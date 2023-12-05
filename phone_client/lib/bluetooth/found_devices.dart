@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
 import 'package:phone_client/bluetooth/bluetooth.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
 
 import 'bluetooth_controller.dart';
 
@@ -68,10 +68,6 @@ class _BluetoothState extends State<BluetoothDevices> {
                               trailing: TextButton(
                                 onPressed: () =>
                                     controller.sendData(widget.data, device),
-                                /*controller.sendData(
-                                    widget.data,
-                                    device,
-                                  );*/
                                 child: StreamBuilder<List<BluetoothDevice>>(
                                   builder: (context, snapshot) => Text(
                                     (snapshot.hasData &&

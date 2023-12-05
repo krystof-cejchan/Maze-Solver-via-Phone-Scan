@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:image/image.dart' as img;
-import 'package:phone_client/helpers/custom_image_class.dart' as custom;
+import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
 
 mixin Library on Object {
   static Uint8List imageAsBytes(img.Image imgImage) =>

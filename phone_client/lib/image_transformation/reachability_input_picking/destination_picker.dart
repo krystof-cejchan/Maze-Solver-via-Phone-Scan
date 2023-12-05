@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/hero_tag/hero_tag_generator.dart';
-import 'package:phone_client/image_proccessing/colour_picking/route_and_wall_global_constants.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
-import 'package:phone_client/image_to_route/search_maze_algorithms/normalizing_path_to_directions.dart';
-import 'package:phone_client/image_to_route/search_maze_algorithms/search_for_shortest_path_in_array.dart';
+import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
+import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
+import 'package:phone_client/image_transformation/colour_picking/route_and_wall_global_constants.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/coordinate.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/coordinates.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/search_maze_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/path_in_image_searching_algorithm/search_maze_algorithms/search_for_shortest_path_in_array.dart';
 
-import '../canvas/custom_canvas.dart';
-import 'normalized_path_widget.dart';
+import '../../canvas/custom_canvas.dart';
+import '../../path_in_image_searching_algorithm/output/normalized_path_widget.dart';
 
 ///another class for choosing the destination in the image
 class DestinationPicker extends StatefulWidget {
