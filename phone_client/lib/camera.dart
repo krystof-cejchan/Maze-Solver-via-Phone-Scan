@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:phone_client/hero_tag/hero_tag_generator.dart';
-import 'package:phone_client/image_proccessing/colour_picking/route_colour_picker.dart';
-import './helpers/custom_image_class.dart' as custom;
+import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
+import 'package:phone_client/image_transformation/colour_picking/route_colour_picker.dart';
+import 'custom_image/custom_image_class.dart' as custom;
 import 'package:image/image.dart' as img;
 
 class CameraScreen extends StatefulWidget {
@@ -40,16 +40,17 @@ class CameraScreenState extends State<CameraScreen> {
       await _controller.setFlashMode(FlashMode.off);
       await _controller.setFocusMode(FocusMode.auto);
 
-      final xFile = await _controller.takePicture();
+      final XFile xFile = await _controller.takePicture();
       custom.Image customImage = custom.Image(
         img.decodeImage(
           File(
             xFile.path,
           ).readAsBytesSync(),
         )!,
+        path: xFile.path,
       );
 
-      File(xFile.path).deleteSync();
+      //File(xFile.path).deleteSync();
       if (customImage.isValid()) {
         _openImageInNewRoute(customImage);
       }
@@ -127,12 +128,10 @@ class CameraScreenState extends State<CameraScreen> {
       preferredCameraDevice: CameraDevice.rear,
     );
     if (pickedImg == null) return;
+
     custom.Image customImage = custom.Image(
-      img.decodeImage(
-        File(
-          pickedImg.path,
-        ).readAsBytesSync(),
-      )!,
+      img.decodeImage(await File(pickedImg.path).readAsBytes())!,
+      path: pickedImg.path,
     );
 
     //File(pickedImg.path).deleteSync();

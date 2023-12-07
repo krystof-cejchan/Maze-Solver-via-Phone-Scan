@@ -3,4 +3,7 @@ enum RobotInstructions {
   left,
   right,
   pass;
+
+  @override
+  String toString() => name.toUpperCase();
 }

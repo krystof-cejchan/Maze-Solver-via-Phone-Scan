@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:phone_client/image_proccessing/image_cropping.dart';
-import '../../helpers/custom_image_class.dart' as custom;
+import '../../custom_image/custom_image_class.dart' as custom;
+import '../../image_proccessing/image_cropping.dart';
 import 'route_and_wall_global_constants.dart';
 
 class ColorPickerWidget extends StatefulWidget {

@@ -10,14 +10,18 @@ class CrossPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final Paint paint = Paint()
       ..color = color
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 1.05;
 
     const crossLength = 20;
-    crossCenter =
-        Offset(crossCenter.dx - fingerOffset, crossCenter.dy - fingerOffset);
+    crossCenter = Offset(
+      crossCenter.dx - fingerOffset,
+      crossCenter.dy - fingerOffset,
+    );
+    //print("${crossCenter.dx} ${crossCenter.dy}");
+
     //horizontal line of the cross
     canvas.drawLine(
       Offset(crossCenter.dx - crossLength, crossCenter.dy),

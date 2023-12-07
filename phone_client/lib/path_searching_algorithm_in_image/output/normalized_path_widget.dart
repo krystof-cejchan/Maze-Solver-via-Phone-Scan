@@ -1,11 +1,11 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
-import 'package:phone_client/helpers/custom_image_class.dart' as custom;
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
-import 'package:phone_client/image_to_route/search_maze_algorithms/normalizing_path_to_directions.dart';
+import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/robot_instructions.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algorithms/normalizing_path_to_directions.dart';
 
-import '../bluetooth/found_devices.dart';
+import '../../bluetooth/found_devices.dart';
 
 class NormalizedPathWidget extends StatefulWidget {
   const NormalizedPathWidget(this.normDirections, {super.key, this.pathImage});
@@ -22,15 +22,13 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
     return Scaffold(
       body: ListView(
         children: [
-          Image.memory(widget.pathImage!.bytes, fit: BoxFit.fitWidth),
-          Flexible(
-            child: Text(
-              widget.normDirections.robotInstructions.toString(),
-              style: const TextStyle(
-                fontSize: 12,
-                backgroundColor: Colors.black87,
-                color: Colors.lightBlue,
-              ),
+          Image.memory(widget.pathImage!.bytes),
+          Text(
+            widget.normDirections.robotInstructions.toString(),
+            style: const TextStyle(
+              fontSize: 12,
+              backgroundColor: Colors.black87,
+              color: Colors.lightBlue,
             ),
           ),
           ElevatedButton(

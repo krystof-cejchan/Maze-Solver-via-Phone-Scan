@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:get/get.dart';
 import 'package:phone_client/bluetooth/bluetooth.dart';
-import 'package:phone_client/image_to_route/classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/robot_instructions.dart';
 
 import 'bluetooth_controller.dart';
 
@@ -12,7 +12,8 @@ class BluetoothDevices extends StatefulWidget implements BluetoothData {
   final Queue<RobotInstructions> robotInstructions;
   const BluetoothDevices(this.robotInstructions, {super.key});
   @override
-  String get data => robotInstructions.toString();
+  String get data =>
+      robotInstructions.map((e) => e.toString()).toList().toString();
 
   @override
   State<StatefulWidget> createState() => _BluetoothState();
@@ -31,9 +32,7 @@ class _BluetoothState extends State<BluetoothDevices> {
                 const SizedBox(height: 20 * 3),
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      controller.scanDevices();
-                    },
+                    onPressed: () => controller.scanDevices(),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: const Color.fromARGB(197, 33, 149, 243),
@@ -69,10 +68,6 @@ class _BluetoothState extends State<BluetoothDevices> {
                               trailing: TextButton(
                                 onPressed: () =>
                                     controller.sendData(widget.data, device),
-                                /*controller.sendData(
-                                    widget.data,
-                                    device,
-                                  );*/
                                 child: StreamBuilder<List<BluetoothDevice>>(
                                   builder: (context, snapshot) => Text(
                                     (snapshot.hasData &&
