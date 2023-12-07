@@ -1,15 +1,15 @@
 import 'dart:collection';
 
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
-import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/enums/maze_representatives.dart';
-import 'package:phone_client/path_in_image_searching_algorithm/classes,enums,exceptions_for_route_algorithm/enums/should_continue.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/maze_representatives.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/should_continue.dart';
 
 import '../../image_transformation/colour_picking/route_and_wall_global_constants.dart';
-import '../classes,enums,exceptions_for_route_algorithm/coordinate.dart';
-import '../classes,enums,exceptions_for_route_algorithm/enums/directions.dart';
-import '../classes,enums,exceptions_for_route_algorithm/enums/robot_instructions.dart';
-import '../classes,enums,exceptions_for_route_algorithm/exceptions/wrong_followup_direction.dart';
-import '../classes,enums,exceptions_for_route_algorithm/mapped_directions_to_coordinates.dart';
+import '../support_classes/coordinate.dart';
+import '../support_classes/enums/directions.dart';
+import '../support_classes/enums/robot_instructions.dart';
+import '../support_classes/exceptions/wrong_followup_direction.dart';
+import '../support_classes/mapped_directions_to_coordinates.dart';
 
 class NormalizedPathDirections {
   final List<Coordinate> _pathCoordinates;
