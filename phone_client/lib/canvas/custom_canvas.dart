@@ -10,7 +10,7 @@ class CrossPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
+    final Paint paint = Paint()
       ..color = color
       ..strokeCap = StrokeCap.round
       ..strokeWidth = 1.05;
