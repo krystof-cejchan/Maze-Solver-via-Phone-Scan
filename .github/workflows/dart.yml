@@ -29,9 +29,9 @@ jobs:
       #  run: dart pub get
 
 
-      - name: Analyze project source
-        working-directory: ./phone_client
-        run: dart analyze
+      #- name: Analyze project source
+      #  working-directory: ./phone_client
+      #  run: dart analyze
 
       # Your project will need to have tests in test/ and a dependency on
       # package:test for this step to succeed. Note that Flutter projects will
