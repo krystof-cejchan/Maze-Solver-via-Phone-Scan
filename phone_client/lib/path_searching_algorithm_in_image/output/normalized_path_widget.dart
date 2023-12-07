@@ -5,7 +5,7 @@ import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/robot_instructions.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algorithms/normalizing_path_to_directions.dart';
 
-import '../../bluetooth/found_devices.dart';
+import '../../bluetooth/found_devices_widget.dart';
 
 class NormalizedPathWidget extends StatefulWidget {
   const NormalizedPathWidget(this.normDirections, {super.key, this.pathImage});

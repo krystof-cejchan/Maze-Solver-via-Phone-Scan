@@ -1,20 +1,12 @@
 //motors
-#define motorLeftPower 5
-#define motorLeftDirection 7
-#define motorRightPower 6
-#define motorRightDirection 8
-
-const int defMotorRightSpeed = 200;
-const int defMotorLeftSpeed = 200;
-int motorLeftSpeed;
-int motorRightSpeed;
-
-
-
+#define motorLeftPower 7
+#define motorLeftDirection 5
+#define motorRightPower 8
+#define motorRightDirection 6
+ int i = 100, j= 100;
 
 void setup() {
   Serial.begin(9600);
-
   pinMode(motorLeftDirection, OUTPUT);
   pinMode(motorLeftPower, OUTPUT);
   pinMode(motorRightDirection, OUTPUT);
@@ -22,8 +14,14 @@ void setup() {
 }
 
 void loop() {
+  delay(70);
+if(i>160){
+  i=100;
+  j=100;
+  }
+  go(i++ , j++);
 
-  go(200, 200);
+  Serial.println(String(i)+" | "+String(j));
 
 }
 

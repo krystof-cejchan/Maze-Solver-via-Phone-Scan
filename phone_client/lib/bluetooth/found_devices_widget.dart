@@ -26,6 +26,9 @@ class _BluetoothState extends State<BluetoothDevices> {
       body: GetBuilder<BluetoothController>(
         init: BluetoothController(),
         builder: (controller) {
+          // init stata
+          controller.scanDevices();
+          // ---
           return SingleChildScrollView(
             child: Column(
               children: [
@@ -38,12 +41,15 @@ class _BluetoothState extends State<BluetoothDevices> {
                       backgroundColor: const Color.fromARGB(197, 33, 149, 243),
                       minimumSize: const Size(350, 55),
                       shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                        borderRadius: BorderRadius.all(Radius.circular(5.5)),
                       ),
                     ),
                     child: const Text(
-                      'SCAN',
-                      style: TextStyle(fontSize: 18, letterSpacing: 1.35),
+                      'SCAN AGAIN',
+                      style: TextStyle(
+                          fontSize: 18,
+                          letterSpacing: 1.80,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
