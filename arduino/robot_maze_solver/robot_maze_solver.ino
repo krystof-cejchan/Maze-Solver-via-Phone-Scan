@@ -20,27 +20,26 @@ int currentValue;
 const int P = 100;
 const int I = 0;
 float calculatedError;
-int correction;
+long sumOfI;
 
 
 // speeeed!
-const int defMotorRightSpeed = 200;
-const int defMotorLeftSpeed = 200;
+const int defMotorRightSpeed = 130;
+const int defMotorLeftSpeed = 130;
 int motorLeftSpeed;
 int motorRightSpeed;
 
 int weight[4] = { -3, -1, 1, 3};
 float sumWeightedValues;
 float sumValues;
-long sumOfI;
-const int boostedWeight = 12;
+const int boostedWeight = 10;
 
 enum dir {LEFT, RIGHT, PASS};
 
 ArduinoQueue<dir> directions;
 
 // given that input is in the following pattern:
-//  {RobotInstruction.X1, RobotInstruction.X2, .  .  ., RobotInstruction.Xn}
+//  {X1, X2, .  .  ., Xn}
 ArduinoQueue<dir> acceptInput(String rawInput) {
   dir accaptable[3] = {PASS, LEFT, RIGHT};
   ArduinoQueue<dir> dirs = ArduinoQueue<dir>();
@@ -49,23 +48,26 @@ ArduinoQueue<dir> acceptInput(String rawInput) {
       case 'P': dirs.enqueue(PASS); break;
       case 'L': dirs.enqueue(LEFT); break;
       case 'R': dirs.enqueue(RIGHT); break;
+      default: continue;
     }
   }
   return dirs;
 }
 
 void setup() {
+  delay(2000);
   bt.begin(9600);
   Serial.begin(9600);
 
-  while (directions.isEmpty()) {
-    if (bt.available())
-    {
-      String data;
-      data = bt.read();
-      directions = acceptInput(data);
-    }
-  }
+  /* while (directions.isEmpty()) {
+     if (bt.available())
+     {
+       String data;
+       data = bt.read();
+       directions = acceptInput(data);
+     }
+    }*/
+  acceptInput("RLR");
   //motory
   pinMode(motorLeftDirection, OUTPUT);
   pinMode(motorLeftPower, OUTPUT);
@@ -116,16 +118,16 @@ void loop() {
 
   readSensors();
 
-  calcDeviation();
+  int correction = calcDeviationCorrection();
 
-  motorLeftSpeed = constrain(defMotorLeftSpeed - correction, 0, 255);
-  motorRightSpeed = constrain(defMotorRightSpeed + correction, 0, 255);
+  motorLeftSpeed = constrain(defMotorLeftSpeed - correction, 0, 150);
+  motorRightSpeed = constrain(defMotorRightSpeed + correction, 0, 150);
 
   go(motorLeftSpeed, motorRightSpeed);
 
-  if (isCrossroad(currDir)) {
+  if (isCrossroad(currDir))
     directions.dequeue();
-  }
+
 }
 
 
@@ -138,7 +140,7 @@ void readSensors()   {
 }
 
 // calculates deviation
-void calcDeviation() {
+int calcDeviationCorrection() {
   sumWeightedValues = 0;
   sumValues = 0;
   for (int i = 0; i < 4; i++) {
@@ -146,7 +148,11 @@ void calcDeviation() {
     sumValues += normalizedValues[i];
   }
   calculatedError = sumWeightedValues / sumValues;
-  correction = int(P * calculatedError);
+  sumOfI += calculatedError;
+  if ((sumOfI * calculatedError) < -10)
+    sumOfI = 0;
+  return int(P * calculatedError + I * sumOfI);
+
 }
 boolean isCrossroad(dir currDir) {
   const byte m = 100;
@@ -159,9 +165,9 @@ boolean isCrossroad(dir currDir) {
 }
 
 void go(int speedLeft, int speedRight) {
-  digitalWrite(motorLeftDirection, HIGH);
+  digitalWrite(motorLeftDirection, LOW);
   analogWrite(motorLeftPower, speedRight);
-  digitalWrite(motorRightDirection, HIGH);
+  digitalWrite(motorRightDirection, LOW);
   analogWrite(motorRightPower, speedLeft);
 }
 
