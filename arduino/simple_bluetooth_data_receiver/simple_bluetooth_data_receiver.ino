@@ -12,6 +12,7 @@ void loop() {
 
   if (bt.available()) /* If data is available on serial port */
   {
+    // if not .write, it would print out just bytes instead of String
     Serial.write(bt.read()); /* Print character received on to the serial monitor */
   }
 }
