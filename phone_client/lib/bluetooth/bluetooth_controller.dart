@@ -31,7 +31,7 @@ class BluetoothController extends GetxController {
 
   Future<void> sendData(dynamic data, BluetoothDevice device) async {
     // it takes a few tries to connect; arduino need to be restarted when wanting to appear as connected
-    device.connect(timeout: const Duration(seconds: 10)); //?
+    connectTo(device);
     List<BluetoothService> services = await device.discoverServices();
 
     for (var service in services) {

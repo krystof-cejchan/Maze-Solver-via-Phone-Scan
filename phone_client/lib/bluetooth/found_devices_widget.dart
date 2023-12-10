@@ -13,7 +13,7 @@ class BluetoothDevices extends StatefulWidget implements BluetoothData {
   const BluetoothDevices(this.robotInstructions, {super.key});
   @override
   String get data =>
-      robotInstructions.map((e) => e.toString()).toList().toString();
+      robotInstructions.map((e) => e.name[0].toUpperCase()).join('');
 
   @override
   State<StatefulWidget> createState() => _BluetoothState();

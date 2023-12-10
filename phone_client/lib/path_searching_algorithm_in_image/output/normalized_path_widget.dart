@@ -24,7 +24,7 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
         children: [
           Image.memory(widget.pathImage!.bytes),
           Text(
-            widget.normDirections.robotInstructions.toString(),
+            widget.normDirections.robotInstructions.join(' — '),
             style: const TextStyle(
               fontSize: 12,
               backgroundColor: Colors.black87,
