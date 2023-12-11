@@ -28,7 +28,7 @@ const int defMotorLeftSpeed = 130;
 int motorLeftSpeed;
 int motorRightSpeed;
 
-bool lastCrossroad = false;
+String inputText = "";
 
 int weight[4] = { -3, -1, 1, 3};
 float sumWeightedValues;
@@ -37,30 +37,29 @@ float sumValues;
 enum dir {
   LEFT,
   RIGHT,
-  PASS
+  PASS,
+  END
 };
 
 dir currDir;
 
-ArduinoQueue < dir > directions = ArduinoQueue < dir > ();
+ArduinoQueue<dir> directions = ArduinoQueue<dir>();
 
 // given that input is in the following pattern:
 //  {X1, X2, .  .  ., Xn}
-void acceptInput(String rawInput) {
-  for (int i = 0; i < rawInput.length(); i++) {
-    switch (rawInput.charAt(i)) {
-      case 'P':
-        directions.enqueue(PASS);
-        break;
-      case 'L':
-        directions.enqueue(LEFT);
-        break;
-      case 'R':
-        directions.enqueue(RIGHT);
-        break;
-      default:
-        continue;
-    }
+void acceptInput(char rawInput) {
+  Serial.println(rawInput);
+  inputText += rawInput;
+  switch (rawInput) {
+    case 'P':
+      directions.enqueue(PASS);
+      break;
+    case 'L':
+      directions.enqueue(LEFT);
+      break;
+    case 'R':
+      directions.enqueue(RIGHT);
+      break;
   }
 }
 
@@ -69,15 +68,11 @@ void setup() {
   bt.begin(9600);
   Serial.begin(9600);
 
-  /* while (directions.isEmpty()) {
-     if (bt.available())
-     {
-       String data;
-       data = bt.read();
-       directions = acceptInput(data);
-     }
-    }*/
-  acceptInput("LR");
+  while (inputText.lastIndexOf('"') < 1) {
+    while (bt.available()) {
+      acceptInput((char)bt.read());
+    }
+  }
   //motory
   pinMode(motorLeftDirection, OUTPUT);
   pinMode(motorLeftPower, OUTPUT);
@@ -119,15 +114,12 @@ void loop() {
   motorRightSpeed = constrain(defMotorRightSpeed + correction, 0, 150);
 
   go(motorLeftSpeed, motorRightSpeed);
-  if (not lastCrossroad) {
-    if (lastCrossroad = isCrossroad()) {
-      stopRobot();
-      delay(400);
-      handleCrossroad();
-      stopRobot();
-    }
-  } else lastCrossroad = isNoCrossroad();
-
+  if (isCrossroad()) {
+    stopRobot();
+    delay(400);
+    handleCrossroad();
+    stopRobot();
+  }
 }
 
 /**
@@ -155,6 +147,12 @@ int calcDeviationCorrection() {
 }
 
 boolean isCrossroad() {
+  if (currDir == END && allSensorsBlack()) {
+    delay(500);
+    while (true) {
+      go(150, 0);
+    }
+  }
   const byte m = 100,
              d = currDir == LEFT ? 3 : 0;
   bool isCurrBlack = constrain(normValue(d), 0, m) > 50;
@@ -164,23 +162,39 @@ boolean isCrossroad() {
   return isCurrBlack;
 }
 
-boolean isNoCrossroad() {
-  return !(constrain(normValue(0), 0, 100) > 50 && constrain(normValue(3), 0, 100) > 50);
+boolean allSensorsBlack() {
+  for (int i = 0; i < 4; i++) {
+    if (constrain(normValue(i), 0, 100) <= 50) return false;
+  }
+  return true;
 }
+
 
 /**
    dequeues queue with directions
    and turns robot according to @param d
 */
 void handleCrossroad() {
-  if (currDir == RIGHT)
+  if (currDir == RIGHT) {
     go(150, 0);
+    delay(900);
+  }
 
-  else if (currDir == LEFT)
+  else if (currDir == LEFT) {
     go(0, 150);
+    delay(900);
+  }
+  else {
+    while (constrain(normValue(0), 0, 100) > 50 || constrain(normValue(3), 0, 100) > 50) {
+      readSensors();
+      int correction = calcDeviationCorrection();
+      motorLeftSpeed = constrain(defMotorLeftSpeed - correction, 0, 150);
+      motorRightSpeed = constrain(defMotorRightSpeed + correction, 0, 150);
+      go(motorLeftSpeed, motorRightSpeed);
+    }
+  }
 
-  delay(900);
-  currDir = !directions.isEmpty() ? directions.dequeue() : PASS;
+  currDir = !directions.isEmpty() ? directions.dequeue() : END;
 }
 
 void go(int speedLeft, int speedRight) {

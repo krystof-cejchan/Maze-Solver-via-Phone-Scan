@@ -8,6 +8,7 @@ import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
 import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
 import '../../custom_image/custom_image_class.dart' as custom;
+import '../colour_picking/route_and_wall_global_constants.dart';
 import 'destination_picker.dart';
 
 /// This class serves to convert an image to an 2D array representing a maze;
@@ -36,8 +37,8 @@ class ImageConversion extends StatefulWidget {
 
 class _ImageConversionState extends State<ImageConversion> {
   final mapColours = {
-    'R': img.ColorInt8.rgba(0, 0, 0, 255),
-    'W': img.ColorInt8.rgba(255, 255, 255, 255),
+    'R': C.routeInt8,
+    'W': C.wallInt8,
   };
   final GlobalKey imageKey = GlobalKey();
   late GlobalKey currentKey;
