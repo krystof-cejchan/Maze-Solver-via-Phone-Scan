@@ -18,7 +18,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   GlobalKey imageKey = GlobalKey();
   GlobalKey paintKey = GlobalKey();
 
-  int toastTime = DateTime.timestamp().millisecondsSinceEpoch;
+  int toastTime = 0; //DateTime.timestamp().millisecondsSinceEpoch;
   Color pickedRouteColour = C.wall;
 
   late GlobalKey currentKey;
@@ -122,7 +122,7 @@ class ColorPickerWidgetState extends State<ColorPickerWidget> {
   }
 
   bool _haveFiveSecondsPassed() {
-    final b = DateTime.timestamp().millisecondsSinceEpoch - toastTime >=
+    final bool b = DateTime.timestamp().millisecondsSinceEpoch - toastTime >=
         const Duration(seconds: 5).inMilliseconds;
     if (b) toastTime = DateTime.timestamp().millisecondsSinceEpoch;
     return b;
