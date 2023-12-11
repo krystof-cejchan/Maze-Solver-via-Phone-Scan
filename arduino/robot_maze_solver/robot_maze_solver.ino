@@ -28,7 +28,7 @@ const int defMotorLeftSpeed = 130;
 int motorLeftSpeed;
 int motorRightSpeed;
 
-bool lastCrossroad = false;
+String inputText = "";
 
 int weight[4] = { -3, -1, 1, 3};
 float sumWeightedValues;
@@ -48,6 +48,8 @@ ArduinoQueue<dir> directions = ArduinoQueue<dir>();
 // given that input is in the following pattern:
 //  {X1, X2, .  .  ., Xn}
 void acceptInput(char rawInput) {
+  Serial.println(rawInput);
+  inputText += rawInput;
   switch (rawInput) {
     case 'P':
       directions.enqueue(PASS);
@@ -66,7 +68,7 @@ void setup() {
   bt.begin(9600);
   Serial.begin(9600);
 
-  while (directions.isEmpty()) {
+  while (inputText.lastIndexOf('"') < 1) {
     while (bt.available()) {
       acceptInput((char)bt.read());
     }
