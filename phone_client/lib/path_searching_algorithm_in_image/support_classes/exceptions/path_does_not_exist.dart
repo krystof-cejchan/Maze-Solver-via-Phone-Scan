@@ -1,0 +1,1 @@
+class NoPathPossiblyExists implements Exception {}

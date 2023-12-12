@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/maze_representatives.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/should_continue.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/exceptions/path_does_not_exist.dart';
 
 import '../../image_transformation/colour_picking/route_and_wall_global_constants.dart';
 import '../support_classes/coordinate.dart';
@@ -19,7 +20,11 @@ class NormalizedPathDirections {
 
   NormalizedPathDirections(this._pathCoordinates, this._imageMaze) {
     mappedDirectionsToCoordinates = _normalizedDirections();
-    robotInstructions = _patchMappedDirectionsToCoordinates();
+    try {
+      robotInstructions = _patchMappedDirectionsToCoordinates();
+    } on StateError {
+      throw NoPathPossiblyExists();
+    }
   }
 
   final _thresholdPixels = 25;
@@ -143,7 +148,8 @@ class NormalizedPathDirections {
     /// [mappedDirectionsToCoordinates] is not empty if this method is called
     final mapDirToCoo = Queue<MappedDirectionsToCoordinates>.from(
         mappedDirectionsToCoordinates);
-    MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst(), next;
+    MappedDirectionsToCoordinates curr = mapDirToCoo.removeFirst();
+    MappedDirectionsToCoordinates next;
     Queue<RobotInstructions> robotInstructions = Queue();
 
     ///looping through {Direction, List of its Coordinates} object

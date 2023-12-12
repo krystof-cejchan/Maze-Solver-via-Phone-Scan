@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
 import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart'
@@ -8,6 +9,7 @@ import 'package:phone_client/path_searching_algorithm_in_image/support_classes/c
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/coordinates.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algorithms/normalizing_path_to_directions.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algorithms/search_for_shortest_path_in_array.dart';
+import 'package:phone_client/path_searching_algorithm_in_image/support_classes/exceptions/path_does_not_exist.dart';
 
 import '../../canvas/custom_canvas.dart';
 import '../../path_searching_algorithm_in_image/output/normalized_path_widget.dart';
@@ -125,7 +127,6 @@ class _DestinationPickerState extends State<DestinationPicker> {
           col[j] = 1;
         }
       }
-      //print(col);
       grid.add(col);
     }
 
@@ -134,10 +135,24 @@ class _DestinationPickerState extends State<DestinationPicker> {
       coordinateStartToFinish,
     ).foundPath;
 
-    final normalizedDirections = NormalizedPathDirections(
-      shortestPath,
-      customImageCopy,
-    );
+    final NormalizedPathDirections normalizedDirections;
+    try {
+      normalizedDirections = NormalizedPathDirections(
+        shortestPath,
+        customImageCopy,
+      );
+    } on NoPathPossiblyExists {
+      Fluttertoast.showToast(
+        msg: "No path exists between these two coordinations!",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM_LEFT,
+        timeInSecForIosWeb: 5,
+        backgroundColor: const Color.fromARGB(255, 186, 170, 168),
+        textColor: const Color.fromARGB(255, 28, 2, 2),
+        fontSize: 12.0,
+      );
+      return;
+    }
 
     final img.Image imgImageCopy = widget.customImage.image;
 

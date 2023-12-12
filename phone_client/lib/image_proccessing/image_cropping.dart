@@ -42,11 +42,8 @@ class _ImageCroppingState extends State<ImageCropping> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ImageConversion(
-          uiImg,
-          widget.wallColour,
-          widget.routeColour,
-        ),
+        builder: (context) =>
+            ImageConversion(uiImg, widget.routeColour, widget.wallColour),
       ),
     );
   }
