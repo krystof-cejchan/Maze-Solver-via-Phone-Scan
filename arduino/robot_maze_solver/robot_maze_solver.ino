@@ -64,7 +64,6 @@ void acceptInput(char rawInput) {
 }
 
 void setup() {
-  delay(2000);
   bt.begin(9600);
   Serial.begin(9600);
 
@@ -148,15 +147,15 @@ int calcDeviationCorrection() {
 
 boolean isCrossroad() {
   if (currDir == END && allSensorsBlack()) {
-    delay(500);
+    delay(800);
     while (true) {
-      go(150, 0);
+      stopRobot();
     }
   }
   const byte m = 100,
-             d = currDir == LEFT ? 3 : 0;
+             d = (currDir == LEFT ? 3 : 0);
   bool isCurrBlack = constrain(normValue(d), 0, m) > 50;
-  if (currDir == PASS && !isCurrBlack)
+  if (currDir == PASS)
     return constrain(normValue(3), 0, m) > 50;
 
   return isCurrBlack;
