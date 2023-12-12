@@ -67,13 +67,18 @@ class _BluetoothState extends State<BluetoothDevices> {
                             elevation: 2,
                             child: ListTile(
                               tileColor: const Color.fromARGB(80, 53, 161, 250),
-                              onTap: () {},
+                              onTap: () => controller.sendData(
+                                widget.data,
+                                device,
+                              ),
                               title: Text(device.name),
                               subtitle: Text(device.id.id),
                               isThreeLine: false,
                               trailing: TextButton(
-                                onPressed: () =>
-                                    controller.sendData(widget.data, device),
+                                onPressed: () => controller.sendData(
+                                  widget.data,
+                                  device,
+                                ),
                                 child: StreamBuilder<List<BluetoothDevice>>(
                                   builder: (context, snapshot) => Text(
                                     (snapshot.hasData &&
