@@ -3,8 +3,8 @@
 *.h linguist-vendored=false
 *.c linguist-vendored=false
 *.dart linguist-vendored=false
-*.swift linguist-vendored=false
 *.java linguist-vendored=false
 *.cmake linguist-vendored=false
 
-*.cmake linguist-language=C
+*.cmake linguist-language=Cpp
+*.c linguist-language=Cpp
