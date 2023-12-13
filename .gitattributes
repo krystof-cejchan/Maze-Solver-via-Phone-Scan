@@ -7,4 +7,3 @@
 *.cmake linguist-vendored=false
 
 *.cmake linguist-language=Cpp
-*.c linguist-language=Cpp
