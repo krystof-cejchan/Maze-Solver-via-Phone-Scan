@@ -59,6 +59,9 @@ class _BluetoothState extends State<BluetoothDevices> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       return ListView.builder(
+                        //physics allow ListView to scroll
+                        physics: const BouncingScrollPhysics(
+                            parent: RangeMaintainingScrollPhysics()),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
