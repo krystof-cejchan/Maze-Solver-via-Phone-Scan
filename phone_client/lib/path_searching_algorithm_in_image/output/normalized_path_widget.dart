@@ -3,7 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
-import 'package:phone_client/helpers/key_generators/reordable_list_keys/key_gen.dart';
+import 'package:phone_client/helpers/key_generators/keys/key_gen.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/enums/robot_instructions.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algorithms/normalizing_path_to_directions.dart';
 
@@ -19,12 +19,13 @@ class NormalizedPathWidget extends StatefulWidget {
 
 /// shows the shortest path with its directions
 class _NormalizedPathState extends State<NormalizedPathWidget> {
-  late final List<RobotInstructions> _robotInstructions;
+  List<RobotInstructions> _robotInstructions = List.empty();
   final StreamController<List<RobotInstructions>> _streamBuilder =
       StreamController();
   @override
   void initState() {
     _robotInstructions = widget.normDirections.robotInstructions.toList();
+    _streamBuilder.add(_robotInstructions);
     super.initState();
   }
 
@@ -42,51 +43,51 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
               color: Colors.lightBlue,
             ),
           ),*/
-
-          StreamBuilder(
-            stream: _streamBuilder.stream,
-            initialData: _robotInstructions,
-            builder: (context, snapshot) {
-              final items = snapshot.data ?? _robotInstructions;
-              return ReorderableListView.builder(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(8),
-                itemCount: (snapshot.data ?? _robotInstructions).length,
-                itemBuilder: (BuildContext context, int index) {
+          ReorderableListView.builder(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8),
+            itemCount: _robotInstructions.length,
+            onReorder: (int oldIndex, int newIndex) {
+              if (oldIndex < newIndex) {
+                newIndex -= 1;
+              }
+              final item = _robotInstructions.removeAt(oldIndex);
+              _robotInstructions.insert(newIndex, item);
+              _streamBuilder.add(_robotInstructions);
+            },
+            itemBuilder: (BuildContext context, int index) {
+              return StreamBuilder(
+                //TODO stream us reused; perhaps try setState()
+                key: KeyGen.generate,
+                stream: _streamBuilder.stream,
+                initialData: _robotInstructions,
+                builder: (context, snapshot) {
+                  _robotInstructions = snapshot.data ?? _robotInstructions;
                   return Container(
                     key: KeyGen.generate,
                     height: 50,
                     color: const Color.fromARGB(255, 65, 179, 255),
                     child: Row(
                       children: [
-                        Text(items[index].toString()),
+                        Text(_robotInstructions[index].toString()),
                         OutlinedButton(
                           key: KeyGen.generate,
                           onPressed: () {
                             //TODO does not respond
                             print('object');
-                            items.removeAt(index);
-                            _streamBuilder.add(items);
+                            _robotInstructions.removeAt(index);
+                            _streamBuilder.add(_robotInstructions);
                           },
                           child: const Icon(Icons.delete_forever),
                         ),
                         IconButton(
-                          onPressed: () =>
-                              _addRobotInstructionsAsRow(index, items),
+                          onPressed: () => _addRobotInstructionsAsRow(index),
                           icon: const Icon(Icons.add_circle_outlined),
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                         ),
                       ],
                     ),
                   );
-                },
-                onReorder: (int oldIndex, int newIndex) {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-                  final item = items.removeAt(oldIndex);
-                  items.insert(newIndex, item);
-                  _streamBuilder.add(items);
                 },
               );
             },
@@ -103,16 +104,15 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
     );
   }
 
-  void _addRobotInstructionsAsRow(
-      final int selectedIndex, List<RobotInstructions> robotInstructions) {
+  void _addRobotInstructionsAsRow(final int selectedIndex) {
     SimpleDialog(
       title: const Text('Select a RobotInstruction'),
       children: <Widget>[
         for (RobotInstructions robotInstruction in RobotInstructions.values)
           SimpleDialogOption(
             onPressed: () {
-              robotInstructions.insert(selectedIndex + 1, robotInstruction);
-              _streamBuilder.add(robotInstructions);
+              _robotInstructions.insert(selectedIndex + 1, robotInstruction);
+              _streamBuilder.add(_robotInstructions);
             },
             child: Text(robotInstruction.name),
           )
