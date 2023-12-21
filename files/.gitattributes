@@ -1,9 +1,0 @@
-* linguist-vendored
-*.ino linguist-vendored=false
-*.h linguist-vendored=false
-*.c linguist-vendored=false
-*.dart linguist-vendored=false
-*.java linguist-vendored=false
-*.cmake linguist-vendored=false
-
-*.cmake linguist-language=Cpp
