@@ -1,3 +1,4 @@
 *.html linguist-language=Dart
 *.cmake linguist-language=C
 *.txt linguist-language=C
+*.h linguist-language=Objective-C
