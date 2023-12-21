@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Welcome to my semester project where a Flutter app turns your phone into a maze solver using the camera as an input and A* algorithm to find the shortest path. It sends the found path via Bluetooth to an Arduino. The Arduino, my project's other half, follows the path, making maze-solving a hands-free adventure.
+Welcome to my semestral project where a Flutter app turns your phone into a maze solver using the camera as an input and A* algorithm to find the shortest path. It sends the found path via Bluetooth to an Arduino. The Arduino, my project's other half, follows the path, making maze-solving a hands-free adventure.
 
 ## Smartphone client
 
