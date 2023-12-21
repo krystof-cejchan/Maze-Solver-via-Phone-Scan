@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/canvas/custom_canvas.dart';
 import 'package:phone_client/helpers/lib_class.dart';
-import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart';
+import 'package:phone_client/helpers/key_generators/hero_tag/hero_tag_generator.dart';
 import '../../custom_image/custom_image_class.dart' as custom;
 import '../colour_picking/route_and_wall_global_constants.dart';
 import 'destination_picker.dart';

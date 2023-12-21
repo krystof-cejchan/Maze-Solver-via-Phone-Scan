@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image/image.dart' as img;
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
-import 'package:phone_client/helpers/hero_tag/hero_tag_generator.dart'
+import 'package:phone_client/helpers/key_generators/hero_tag/hero_tag_generator.dart'
     show HeroTag;
 import 'package:phone_client/image_transformation/colour_picking/route_and_wall_global_constants.dart';
 import 'package:phone_client/path_searching_algorithm_in_image/support_classes/coordinate.dart';
