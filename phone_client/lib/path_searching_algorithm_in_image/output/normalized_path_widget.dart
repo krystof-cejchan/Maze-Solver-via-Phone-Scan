@@ -20,12 +20,11 @@ class NormalizedPathWidget extends StatefulWidget {
 /// shows the shortest path with its directions
 class _NormalizedPathState extends State<NormalizedPathWidget> {
   List<RobotInstructions> _robotInstructions = List.empty();
-  final StreamController<List<RobotInstructions>> _streamBuilder =
-      StreamController();
+
   @override
   void initState() {
-    _robotInstructions = widget.normDirections.robotInstructions.toList();
-    _streamBuilder.add(_robotInstructions);
+    setState(() =>
+        _robotInstructions = widget.normDirections.robotInstructions.toList());
     super.initState();
   }
 
@@ -52,43 +51,29 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
                 newIndex -= 1;
               }
               final item = _robotInstructions.removeAt(oldIndex);
-              _robotInstructions.insert(newIndex, item);
-              _streamBuilder.add(_robotInstructions);
+              setState(() => _robotInstructions.insert(newIndex, item));
             },
             itemBuilder: (BuildContext context, int index) {
-              return StreamBuilder(
-                //TODO stream us reused; perhaps try setState()
+              //TODO stream us reused; perhaps try setState()
+              return ListTile(
+                tileColor: const Color.fromARGB(238, 53, 255, 157),
                 key: KeyGen.generate,
-                stream: _streamBuilder.stream,
-                initialData: _robotInstructions,
-                builder: (context, snapshot) {
-                  _robotInstructions = snapshot.data ?? _robotInstructions;
-                  return Container(
-                    key: KeyGen.generate,
-                    height: 50,
-                    color: const Color.fromARGB(255, 65, 179, 255),
-                    child: Row(
-                      children: [
-                        Text(_robotInstructions[index].toString()),
-                        OutlinedButton(
-                          key: KeyGen.generate,
-                          onPressed: () {
-                            //TODO does not respond
-                            print('object');
-                            _robotInstructions.removeAt(index);
-                            _streamBuilder.add(_robotInstructions);
-                          },
-                          child: const Icon(Icons.delete_forever),
-                        ),
-                        IconButton(
-                          onPressed: () => _addRobotInstructionsAsRow(index),
-                          icon: const Icon(Icons.add_circle_outlined),
-                          padding: const EdgeInsets.symmetric(vertical: 2.0),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                title: Text(_robotInstructions[index].toString()),
+                leading: OutlinedButton(
+                  clipBehavior: Clip.hardEdge,
+                  key: KeyGen.generate,
+                  onPressed: () {
+                    //TODO does not respond
+                    print('object');
+                    setState(() => _robotInstructions.removeAt(index));
+                  },
+                  child: const Icon(Icons.delete_forever),
+                ),
+                trailing: IconButton(
+                  onPressed: () => _addRobotInstructionsAsRow(index),
+                  icon: const Icon(Icons.add_circle_outlined),
+                  padding: const EdgeInsets.symmetric(vertical: 2.0),
+                ),
               );
             },
           ),
@@ -111,8 +96,9 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
         for (RobotInstructions robotInstruction in RobotInstructions.values)
           SimpleDialogOption(
             onPressed: () {
-              _robotInstructions.insert(selectedIndex + 1, robotInstruction);
-              _streamBuilder.add(_robotInstructions);
+              setState(() {
+                _robotInstructions.insert(selectedIndex + 1, robotInstruction);
+              });
             },
             child: Text(robotInstruction.name),
           )
@@ -125,7 +111,9 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
         context,
         MaterialPageRoute(
           builder: (context) => BluetoothDevices(
-            robotInstructions ?? widget.normDirections.robotInstructions,
+            Queue<RobotInstructions>.from(
+              _robotInstructions,
+            ),
           ),
         ),
       );

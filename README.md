@@ -1,5 +1,11 @@
 
 # Maze Solver via Phone Scan
+- Table of Contents
+  * [Introduction](#introduction)
+  * [Smartphone client](#smartphone-client)
+    + [Features](#features)
+  * [Arduino robot](#arduino-robot)
+    + [Features](#features-1)
 
 ## Introduction
 
@@ -21,7 +27,7 @@ Using Flutter with Dart, I created a hybrid application that runs on Android and
 
 Using an Arduino Nano microcontroller, I created the final piece of this project. The robot receives instructions via Bluetooth from the smartphone client and conquers the maze.
 
-### Features:
+### Features
 
 -   **Bluetooth Connectivity:** Wirelessly establish a connection from smartphone to the Arduino robot
 -   **Real-time Data Reception:** Receive real-time instructions from the app via Bluetooth, guiding your robot through the maze with efficiency.
