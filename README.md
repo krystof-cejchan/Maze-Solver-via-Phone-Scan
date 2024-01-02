@@ -1,5 +1,8 @@
 
 # Maze Solver via Phone Scan
+
+[![flutter](https://github.com/krystof-cejchan/Maze-Solver-via-Phone-Scan/actions/workflows/flutter.yml/badge.svg)](https://github.com/krystof-cejchan/Maze-Solver-via-Phone-Scan/actions/workflows/flutter.yml)
+
 - Table of Contents
   * [Introduction](#introduction)
   * [Smartphone client](#smartphone-client)
