@@ -6,9 +6,8 @@ on:
   pull_request:
     branches: [ "main" ]
 
-# Publish using the reusable workflow from dart-lang.
 jobs:
-  publish-package:
+  get-n-test:
     runs-on: ubuntu-latest
 
     env:
@@ -29,5 +28,9 @@ jobs:
 
       - name: Run tests
         run: flutter test
+        working-directory: ${{env.working-directory}} 
+
+      - name: Build APK
+        run: flutter build apk  
         working-directory: ${{env.working-directory}} 
 
