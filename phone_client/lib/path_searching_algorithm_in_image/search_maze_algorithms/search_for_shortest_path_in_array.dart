@@ -12,7 +12,7 @@ class PathInMatrix {
   }
 
   ///an algorithm to find the shortest path from a starting [coordinates] to an end [coordinates]
-  ///in a 2d matrix   (where 0 represent a route and 1 represent walls)
+  ///in a 2d matrix   (where 0 represent a route — 1 represent walls)
   /// https://www.geeksforgeeks.org/a-search-algorithm/
   List<Coordinate> findPathUsingAStar(
       List<List<int>> grid, Coordinates coordinates) {
