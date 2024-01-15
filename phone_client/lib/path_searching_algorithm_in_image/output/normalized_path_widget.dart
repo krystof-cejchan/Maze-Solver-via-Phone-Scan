@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:phone_client/custom_image/custom_image_class.dart' as custom;
@@ -8,8 +9,11 @@ import 'package:phone_client/path_searching_algorithm_in_image/search_maze_algor
 import '../../bluetooth/found_devices_widget.dart';
 
 class NormalizedPathWidget extends StatefulWidget {
-  const NormalizedPathWidget(this.normDirections, {super.key, this.pathImage});
+  NormalizedPathWidget(this.normDirections, {super.key, this.pathImage});
   final NormalizedPathDirections normDirections;
+  late final List<RobotInstructions> items =
+      normDirections.robotInstructions.toList();
+
   final custom.Image? pathImage;
   @override
   State<StatefulWidget> createState() => _NormalizedPathState();
@@ -20,17 +24,11 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Image.memory(widget.pathImage!.bytes),
-          Text(
-            widget.normDirections.robotInstructions.join(' — '),
-            style: const TextStyle(
-              fontSize: 12,
-              backgroundColor: Colors.black87,
-              color: Colors.lightBlue,
-            ),
-          ),
+          Expanded(child: _generateRobotInstructions()),
           ElevatedButton(
             onPressed: _goto,
             style: ElevatedButton.styleFrom(
@@ -43,11 +41,156 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
     );
   }
 
+  ReorderableListView _generateRobotInstructions() {
+    final List<Card> cards = <Card>[
+      for (int index = 0; index < widget.items.length; index += 1)
+        Card(
+          key: Key('$index'),
+          color: index.isEven ? Colors.green : Colors.lightGreen,
+          child: SizedBox(
+            height: 80,
+            child: Row(
+              children: [
+                const Padding(padding: EdgeInsets.only(left: 25)),
+                Text('${index + 1}. ${widget.items[index]}'),
+                IconButton(
+                    onPressed: () =>
+                        setState(() => widget.items.removeAt(index)),
+                    icon: const Icon(Icons.delete_forever)),
+                const Padding(padding: EdgeInsets.only(left: 25)),
+                IconButton(
+                    onPressed: () async => _addRobotInstructionToList(
+                        await _askAboutRobotInstruction(), index + 1),
+                    icon: const Icon(Icons.add_circle))
+              ],
+            ),
+          ),
+        ),
+    ];
+
+    Widget proxyDecorator(
+        Widget child, int index, Animation<double> animation) {
+      return AnimatedBuilder(
+        animation: animation,
+        builder: (BuildContext context, Widget? child) {
+          final double animValue = Curves.easeInOut.transform(animation.value);
+          final double elevation = lerpDouble(1, 6, animValue)!;
+          final double scale = lerpDouble(1, 1.02, animValue)!;
+          return Transform.scale(
+            scale: scale,
+            child: Card(
+              elevation: elevation,
+              color: cards[index].color,
+              child: cards[index].child,
+            ),
+          );
+        },
+        child: child,
+      );
+    }
+
+    return ReorderableListView(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      proxyDecorator: proxyDecorator,
+      onReorder: (int oldIndex, int newIndex) {
+        setState(
+          () {
+            if (oldIndex < newIndex) {
+              newIndex -= 1;
+            }
+            final RobotInstructions item = widget.items.removeAt(oldIndex);
+            widget.items.insert(newIndex, item);
+          },
+        );
+      },
+      children: cards,
+    );
+  }
+
+  Future<RobotInstructions?> _askAboutRobotInstruction() async {
+    return await showDialog<RobotInstructions>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            shadowColor: Colors.grey,
+            title: const Text('Select new instruction'),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, RobotInstructions.left);
+                },
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0))),
+                  ),
+                  onPressed: () =>
+                      Navigator.pop(context, RobotInstructions.left),
+                  child: (const Text(
+                    'LEFT',
+                    style: TextStyle(
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline),
+                  )),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, RobotInstructions.right);
+                },
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0))),
+                  ),
+                  onPressed: () =>
+                      Navigator.pop(context, RobotInstructions.right),
+                  child: (const Text(
+                    'RIGHT',
+                    style: TextStyle(
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline),
+                  )),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, RobotInstructions.pass);
+                },
+                child: OutlinedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0))),
+                  ),
+                  onPressed: () =>
+                      Navigator.pop(context, RobotInstructions.pass),
+                  child: (const Text(
+                    'PASS',
+                    style: TextStyle(
+                        fontSize: 17.5,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline),
+                  )),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
+  void _addRobotInstructionToList(
+      RobotInstructions? ri, int indexBelowElement) {
+    if (ri == null) return;
+    setState(() => widget.items.insert(indexBelowElement, ri));
+  }
+
   void _goto({Queue<RobotInstructions>? robotInstructions}) => Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => BluetoothDevices(
-            robotInstructions ?? widget.normDirections.robotInstructions,
+            robotInstructions ?? Queue.from(widget.items),
           ),
         ),
       );
