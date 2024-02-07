@@ -27,7 +27,10 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Image.memory(widget.pathImage!.bytes),
+          Image.memory(
+            widget.pathImage!.bytes,
+            height: MediaQuery.of(context).size.height / 2,
+          ),
           Expanded(child: _generateRobotInstructions()),
           ElevatedButton(
             onPressed: _goto,
@@ -47,21 +50,65 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
         Card(
           key: Key('$index'),
           color: index.isEven ? Colors.green : Colors.lightGreen,
-          child: SizedBox(
-            height: 80,
-            child: Row(
+          child: SizedBox.fromSize(
+            size: const Size(50, 104),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Padding(padding: EdgeInsets.only(left: 25)),
-                Text('${index + 1}. ${widget.items[index]}'),
-                IconButton(
-                    onPressed: () =>
-                        setState(() => widget.items.removeAt(index)),
-                    icon: const Icon(Icons.delete_forever)),
-                const Padding(padding: EdgeInsets.only(left: 25)),
-                IconButton(
-                    onPressed: () async => _addRobotInstructionToList(
-                        await _askAboutRobotInstruction(), index + 1),
-                    icon: const Icon(Icons.add_circle))
+                /*ListTile(
+                  leading: Text(
+                    "${index + 1}.",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 25),
+                  ),
+                  title: Text(
+                    widget.items[index].toString(),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 25),
+                  ),
+                  subtitle: Icon(widget.items[index] == RobotInstructions.left
+                      ? Icons.roundabout_left_rounded
+                      : widget.items[index] == RobotInstructions.right
+                          ? Icons.roundabout_right_rounded
+                          : Icons.add_road_rounded),
+                  isThreeLine: true,
+                  dense: true,
+                  style: ListTileStyle.drawer,
+                ),*/
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${index + 1}.",
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 25),
+                    ),
+                    Text(
+                      widget.items[index].toString(),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 25),
+                    ),
+                    Icon(widget.items[index] == RobotInstructions.left
+                        ? Icons.roundabout_left_rounded
+                        : widget.items[index] == RobotInstructions.right
+                            ? Icons.roundabout_right_rounded
+                            : Icons.add_road_rounded),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: () =>
+                            setState(() => widget.items.removeAt(index)),
+                        icon: const Icon(Icons.delete_forever)),
+                    const SizedBox(width: 8),
+                    IconButton(
+                        onPressed: () async => _addRobotInstructionToList(
+                            await _askAboutRobotInstruction(), index + 1),
+                        icon: const Icon(Icons.add_circle)),
+                  ],
+                ),
               ],
             ),
           ),
