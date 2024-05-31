@@ -49,55 +49,33 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
       for (int index = 0; index < widget.items.length; index += 1)
         Card(
           key: Key('$index'),
-          color: index.isEven ? Colors.green : Colors.lightGreen,
+          color: widget.items[index] == RobotInstructions.left
+              ? Colors.lightBlue
+              : (widget.items[index] == RobotInstructions.pass
+                  ? Colors.yellowAccent
+                  : Colors.lightGreen),
           child: SizedBox.fromSize(
-            size: const Size(50, 104),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                /*ListTile(
-                  leading: Text(
-                    "${index + 1}.",
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 25),
-                  ),
-                  title: Text(
-                    widget.items[index].toString(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w600, fontSize: 25),
-                  ),
-                  subtitle: Icon(widget.items[index] == RobotInstructions.left
-                      ? Icons.roundabout_left_rounded
-                      : widget.items[index] == RobotInstructions.right
-                          ? Icons.roundabout_right_rounded
-                          : Icons.add_road_rounded),
-                  isThreeLine: true,
-                  dense: true,
-                  style: ListTileStyle.drawer,
-                ),*/
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       "${index + 1}.",
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 25),
+                          fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                     Text(
                       widget.items[index].toString(),
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 25),
+                          fontWeight: FontWeight.w600, fontSize: 16),
                     ),
                     Icon(widget.items[index] == RobotInstructions.left
                         ? Icons.roundabout_left_rounded
                         : widget.items[index] == RobotInstructions.right
                             ? Icons.roundabout_right_rounded
                             : Icons.add_road_rounded),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
                     IconButton(
                         onPressed: () =>
                             setState(() => widget.items.removeAt(index)),
@@ -145,6 +123,7 @@ class _NormalizedPathState extends State<NormalizedPathWidget> {
             if (oldIndex < newIndex) {
               newIndex -= 1;
             }
+
             final RobotInstructions item = widget.items.removeAt(oldIndex);
             widget.items.insert(newIndex, item);
           },
